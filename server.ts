@@ -93,16 +93,40 @@ async function startServer() {
 
     // Check availability
     for (const b of bookingsData) {
-      const existing = db.prepare(`
-        SELECT id FROM bookings 
-        WHERE row_number = ? AND umbrella_number = ? 
-        AND (start_date <= ? AND end_date >= ?)
-      `).get(b.row_number, b.umbrella_number, b.end_date, b.start_date);
+      if (b.row_number === 0) {
+        // Riva zone: check total booked quantity vs max capacity (50 per zone)
+        const RIVA_MAX_CAPACITY = 50;
+        const result = db.prepare(`
+          SELECT COALESCE(SUM(quantity), 0) as booked
+          FROM bookings 
+          WHERE row_number = 0 AND umbrella_number = ? 
+          AND (start_date <= ? AND end_date >= ?)
+        `).get(b.umbrella_number, b.end_date, b.start_date) as any;
 
-      if (existing) {
-        return res.status(400).json({ error: `Postazione ${b.row_number === 0 ? 'Riva ' + b.umbrella_number : b.umbrella_number * 10 + b.row_number} già prenotata per queste date` });
+        const alreadyBooked = result?.booked ?? 0;
+        const requestedQty = b.quantity ?? 1;
+
+        if (alreadyBooked + requestedQty > RIVA_MAX_CAPACITY) {
+          return res.status(400).json({ 
+            error: `Zona Riva ${b.zone_id} esaurita per queste date. Disponibili: ${RIVA_MAX_CAPACITY - alreadyBooked} lettini.` 
+          });
+        }
+      } else {
+        // Normal umbrella: check if any booking exists for this spot and date range
+        const existing = db.prepare(`
+          SELECT id FROM bookings 
+          WHERE row_number = ? AND umbrella_number = ? 
+          AND (start_date <= ? AND end_date >= ?)
+        `).get(b.row_number, b.umbrella_number, b.end_date, b.start_date);
+
+        if (existing) {
+          return res.status(400).json({ 
+            error: `Ombrellone N.${b.umbrella_number * 10 + b.row_number} già prenotato per queste date` 
+          });
+        }
       }
     }
+
 
     const insertBooking = db.prepare(`
       INSERT INTO bookings (row_number, umbrella_number, zone_id, quantity, start_date, end_date, user_name, user_email, user_phone, total_price, is_paid, payment_method)
