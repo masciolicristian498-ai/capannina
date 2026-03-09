@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Calendar, MapPin, Hash, QrCode, Mail, Phone, User, Waves } from 'lucide-react';
+import { CheckCircle, Calendar, MapPin, Hash, Mail, Phone, User, Waves, Home } from 'lucide-react';
 
 interface SuccessVoucherProps {
   isOpen: boolean;
@@ -108,22 +108,23 @@ export function SuccessVoucher({ isOpen, onClose, bookingDetails }: SuccessVouch
               <p className="text-xs font-semibold text-green-700 text-center">Abbiamo inviato un'email di conferma con i dettagli alla tua casella di posta.</p>
             </div>
 
-            {/* QR Code Placeholder */}
-            <div className="mt-6 flex flex-col items-center">
-              <div className="p-3 bg-white border-2 border-slate-100 rounded-xl shadow-sm mb-2 opacity-80">
-                <QrCode className="w-16 h-16 text-slate-800" strokeWidth={1} />
-              </div>
-              <p className="text-[10px] text-slate-400 font-black font-mono tracking-widest uppercase">ID: BKG-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
-            </div>
+
           </div>
 
           {/* Actions */}
-          <div className="p-6 bg-slate-50 border-t border-slate-100">
+          <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-3">
              <button
                onClick={onClose}
                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-black rounded-xl shadow-lg shadow-cyan-500/30 transition-all active:scale-95 flex items-center justify-center h-[56px]"
              >
-               Chiudi e torna alla spiaggia
+               Chiudi e torna alla mappa
+             </button>
+             <button
+               onClick={() => { onClose(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+               className="w-full py-3 bg-white border-2 border-slate-200 hover:border-cyan-400 hover:bg-cyan-50 text-slate-700 font-semibold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+             >
+               <Home className="w-4 h-4 text-cyan-600" />
+               Torna alla Home
              </button>
           </div>
         </motion.div>
