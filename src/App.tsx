@@ -7,10 +7,11 @@ import { SuccessVoucher } from './components/SuccessVoucher';
 import { BeachSkeleton } from './components/BeachSkeleton';
 import { MyBookings } from './components/MyBookings';
 import { PoolSection } from './components/PoolSection';
+import { InteractiveBeach3D } from './components/InteractiveBeach3D';
 import { Umbrella, Booking } from './types';
 import { ROWS, UMBRELLAS_PER_ROW, RIVA_ZONES, POOL } from './constants';
 import { format, addDays, differenceInDays, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, ShieldAlert, ChevronDown, Coffee, Sun, TentTree, Droplets, Home, Cloud, Star, Anchor, Fish } from 'lucide-react';
+import { Calendar as CalendarIcon, ShieldAlert, ChevronDown, Cloud, Star, Anchor, Fish, TentTree, Home } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
@@ -146,7 +147,6 @@ export default function App() {
       {/* ── Home / Spiaggia ── */}
       {currentPage === 'home' && (
         <>
-          {/* Hero Section */}
           <div className="relative bg-emerald-900 overflow-hidden">
             <div className="absolute inset-0">
               <motion.img
@@ -160,57 +160,71 @@ export default function App() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 to-transparent" />
             </div>
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 flex flex-col items-center text-center">
-              <motion.h1 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6"
-              >
-                Benvenuti a La Capannina
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="mt-4 max-w-2xl text-xl text-emerald-100 mb-10"
-              >
-                Il tuo angolo di paradiso a Lavinio. Sabbia finissima, mare cristallino e tutti i comfort per una giornata indimenticabile.
-              </motion.p>
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.8, type: "spring", stiffness: 200 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={scrollToBooking}
-                className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-emerald-900 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-xl"
-              >
-                Prenota Ora
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
+
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 flex flex-col lg:flex-row items-center justify-between gap-12">
+              {/* Text side */}
+              <div className="text-center lg:text-left flex-1 z-10">
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6"
                 >
-                  <ChevronDown className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
-                </motion.div>
-              </motion.button>
+                  Benvenuti a La Capannina
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="mt-4 max-w-2xl text-xl text-emerald-100 mb-10"
+                >
+                  Il tuo angolo di paradiso a Lavinio. Sabbia finissima, mare cristallino e tutti i comfort per una giornata indimenticabile.
+                </motion.p>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.8, type: "spring", stiffness: 200 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={scrollToBooking}
+                  className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-emerald-900 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-xl"
+                >
+                  Prenota Ora
+                  <motion.div
+                    animate={{ y: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  >
+                    <ChevronDown className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+                  </motion.div>
+                </motion.button>
+              </div>
+
+              {/* 3D Beach Scene - hidden on mobile */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, x: 60 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.5, type: "spring", stiffness: 80 }}
+                className="hidden lg:block flex-1 max-w-md h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-black/10 backdrop-blur-sm z-10"
+              >
+                <InteractiveBeach3D />
+              </motion.div>
             </div>
 
-            {/* Ambient Animated Clouds */}
+            {/* Clouds */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-              <motion.div 
+              <motion.div
                 className="absolute top-10 left-[10%]"
                 animate={{ x: [0, 100, 0] }}
                 transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
               >
-                <Cloud className="w-24 h-24 text-white/30" />
+                <Cloud className="w-24 h-24 text-white/20" />
               </motion.div>
-              <motion.div 
-                className="absolute top-24 right-[20%]"
+              <motion.div
+                className="absolute top-24 right-[50%]"
                 animate={{ x: [0, -80, 0] }}
                 transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
               >
-                <Cloud className="w-32 h-32 text-white/20" />
+                <Cloud className="w-32 h-32 text-white/15" />
               </motion.div>
             </div>
           </div>
@@ -365,11 +379,77 @@ export default function App() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {[
-                  { icon: Sun, title: "Lettini e Ombrelloni", desc: "Attrezzature comode (inclusi sdraio e sedie da regista) per il tuo relax al mare.", bg: "bg-orange-100", text: "text-orange-600", glow: "hover:shadow-orange-200/60", border: "hover:border-orange-300", shine: "from-orange-400/10" },
-                  { icon: Coffee, title: "Bar e Tavola Calda", desc: "Ottimi pasti caldi e freddi, colazioni e aperitivi per ogni momento della giornata.", bg: "bg-amber-100", text: "text-amber-700", glow: "hover:shadow-amber-200/60", border: "hover:border-amber-300", shine: "from-amber-400/10" },
-                  { icon: Droplets, title: "Docce Calde e Fredde", desc: "Servizi igienici e docce sempre pulite e disponibili per tutti i bagnanti.", bg: "bg-cyan-100", text: "text-cyan-600", glow: "hover:shadow-cyan-200/60", border: "hover:border-cyan-300", shine: "from-cyan-400/10" },
-                  { icon: TentTree, title: "Zone Ombra e Picnic", desc: "Aree attrezzate con tavoli per consumare comodamente il pranzo portato da casa.", bg: "bg-emerald-100", text: "text-emerald-700", glow: "hover:shadow-emerald-200/60", border: "hover:border-emerald-300", shine: "from-emerald-400/10" },
-                  { icon: Home, title: "Cabine Private", desc: "Cabine riservate per cambiarsi o depositare i propri effetti personali in sicurezza.", bg: "bg-blue-100", text: "text-blue-600", glow: "hover:shadow-blue-200/60", border: "hover:border-blue-300", shine: "from-blue-400/10" }
+                  {
+                    title: "Lettini e Ombrelloni",
+                    desc: "Attrezzature comode per il tuo relax al mare.",
+                    glow: "hover:shadow-orange-200/60", border: "hover:border-orange-300", shine: "from-orange-400/10",
+                    svg: (
+                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 8 Q8 20 8 32 Q16 26 24 32 Q32 26 40 32 Q40 20 24 8Z" fill="#fb923c" opacity="0.9"/>
+                        <line x1="24" y1="28" x2="24" y2="44" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round"/>
+                        <rect x="10" y="38" width="28" height="6" rx="3" fill="#fde68a" stroke="#f59e0b" strokeWidth="1.5"/>
+                        <circle cx="24" cy="28" r="3" fill="#78350f"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    title: "Bar e Tavola Calda",
+                    desc: "Bar, colazioni, pranzi e aperitivi.",
+                    glow: "hover:shadow-amber-200/60", border: "hover:border-amber-300", shine: "from-amber-400/10",
+                    svg: (
+                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="12" y="20" width="24" height="20" rx="4" fill="#fde68a" stroke="#f59e0b" strokeWidth="1.5"/>
+                        <path d="M36 24 Q44 26 42 34 Q38 36 36 34" fill="#fed7aa" stroke="#f97316" strokeWidth="1.5"/>
+                        <path d="M14 20 Q12 10 18 8 Q16 14 22 12" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        <path d="M20 20 Q18 12 24 10 Q22 16 28 14" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        <rect x="8" y="40" width="32" height="3" rx="1.5" fill="#d97706"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    title: "Docce Calde e Fredde",
+                    desc: "Docce e servizi sempre puliti.",
+                    glow: "hover:shadow-cyan-200/60", border: "hover:border-cyan-300", shine: "from-cyan-400/10",
+                    svg: (
+                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="14" r="8" fill="#bae6fd" stroke="#0ea5e9" strokeWidth="1.5"/>
+                        <path d="M16 22 Q12 28 14 34" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        <path d="M24 22 L24 36" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round"/>
+                        <path d="M32 22 Q36 28 34 34" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        {[16,24,32].map((cx,i) => <circle key={i} cx={cx} cy={40} r="2" fill="#0ea5e9" opacity="0.7"/>)}
+                      </svg>
+                    )
+                  },
+                  {
+                    title: "Zone Ombra e Picnic",
+                    desc: "Aree picnic attrezzate all'ombra.",
+                    glow: "hover:shadow-emerald-200/60", border: "hover:border-emerald-300", shine: "from-emerald-400/10",
+                    svg: (
+                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 6 Q12 18 18 28 Q20 32 24 32 Q28 32 30 28 Q36 18 24 6Z" fill="#4ade80" stroke="#16a34a" strokeWidth="1.5"/>
+                        <rect x="22" y="30" width="4" height="12" rx="2" fill="#92400e"/>
+                        <rect x="10" y="40" width="28" height="3" rx="1.5" fill="#d97706"/>
+                        <rect x="14" y="38" width="20" height="2" rx="1" fill="#fde68a"/>
+                        <rect x="8" y="36" width="4" height="5" rx="1" fill="#a3a3a3"/>
+                        <rect x="36" y="36" width="4" height="5" rx="1" fill="#a3a3a3"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    title: "Cabine Private",
+                    desc: "Cabine riservate per cambiarsi.",
+                    glow: "hover:shadow-blue-200/60", border: "hover:border-blue-300", shine: "from-blue-400/10",
+                    svg: (
+                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="22" width="32" height="22" rx="3" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.5"/>
+                        <polygon points="4,24 24,6 44,24" fill="#93c5fd" stroke="#3b82f6" strokeWidth="1.5"/>
+                        <rect x="19" y="32" width="10" height="12" rx="2" fill="#bfdbfe" stroke="#3b82f6" strokeWidth="1"/>
+                        <circle cx="27" cy="38" r="1.5" fill="#2563eb"/>
+                        <rect x="11" y="26" width="6" height="8" rx="1" fill="white" stroke="#93c5fd" strokeWidth="1"/>
+                        <rect x="31" y="26" width="6" height="8" rx="1" fill="white" stroke="#93c5fd" strokeWidth="1"/>
+                      </svg>
+                    )
+                  },
                 ].map((s, index) => (
                   <motion.div
                     key={index}
@@ -382,14 +462,11 @@ export default function App() {
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${s.shine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-stone-100 text-stone-400 text-[10px] font-black flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors duration-300">
-                      {index + 1}
-                    </div>
                     <motion.div
-                      whileHover={{ scale: 1.15 }}
-                      className={`w-14 h-14 ${s.bg} ${s.text} rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-300`}
+                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-300 group-hover:shadow-md"
                     >
-                      <s.icon className="w-7 h-7" />
+                      {s.svg}
                     </motion.div>
                     <h3 className="text-lg font-bold text-stone-900 mb-2 leading-tight relative z-10">{s.title}</h3>
                     <p className="text-stone-500 text-sm leading-relaxed relative z-10">{s.desc}</p>

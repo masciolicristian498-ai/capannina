@@ -175,14 +175,22 @@ export function PoolSection() {
                 </span>
               </h3>
               <p className="text-stone-500 text-sm mt-1 leading-relaxed max-w-md">
-                Ombrellone e lettino inclusi. Accesso giornaliero con uso di docce e servizi.
+                Ombrellone e lettino inclusi · Docce e servizi disponibili
               </p>
-              <p className="text-sm font-semibold text-cyan-700 mt-2 flex items-center gap-1.5">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-                </svg>
-                €15 / persona / giorno
-              </p>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                  </svg>
+                  <span>Giornata intera — <strong>€20</strong> <span className="font-normal text-stone-400 text-xs">(9:00–19:00)</span></span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-sky-700 bg-sky-50 border border-sky-200 px-3 py-2 rounded-xl">
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                  </svg>
+                  <span>Mezza giornata — <strong>€12</strong> <span className="font-normal text-stone-400 text-xs">(9:00–14:00 o 14:00–19:00)</span></span>
+                </div>
+              </div>
             </div>
 
             {/* Info box */}
