@@ -365,33 +365,32 @@ export default function App() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {[
-                  { icon: Sun, title: "Lettini e Ombrelloni", desc: "Attrezzature comode (inclusi sdraio e sedie da regista) per il tuo relax al mare.", bg: "bg-orange-100", text: "text-orange-600" },
-                  { icon: Coffee, title: "Bar e Tavola Calda", desc: "Ottimi pasti caldi e freddi, colazioni e aperitivi per ogni momento della giornata.", bg: "bg-amber-100", text: "text-amber-700" },
-                  { icon: Droplets, title: "Docce Calde e Fredde", desc: "Servizi igienici e docce sempre pulite e disponibili per tutti i bagnanti.", bg: "bg-cyan-100", text: "text-cyan-600" },
-                  { icon: TentTree, title: "Zone Ombra e Picnic", desc: "Aree attrezzate con tavoli per consumare comodamente il pranzo portato da casa.", bg: "bg-emerald-100", text: "text-emerald-700" },
-                  { icon: Home, title: "Cabine Private", desc: "Cabine riservate per cambiarsi o depositare i propri effetti personali in sicurezza.", bg: "bg-blue-100", text: "text-blue-600" }
+                  { icon: Sun, title: "Lettini e Ombrelloni", desc: "Attrezzature comode (inclusi sdraio e sedie da regista) per il tuo relax al mare.", bg: "bg-orange-100", text: "text-orange-600", glow: "hover:shadow-orange-200/60", border: "hover:border-orange-300", shine: "from-orange-400/10" },
+                  { icon: Coffee, title: "Bar e Tavola Calda", desc: "Ottimi pasti caldi e freddi, colazioni e aperitivi per ogni momento della giornata.", bg: "bg-amber-100", text: "text-amber-700", glow: "hover:shadow-amber-200/60", border: "hover:border-amber-300", shine: "from-amber-400/10" },
+                  { icon: Droplets, title: "Docce Calde e Fredde", desc: "Servizi igienici e docce sempre pulite e disponibili per tutti i bagnanti.", bg: "bg-cyan-100", text: "text-cyan-600", glow: "hover:shadow-cyan-200/60", border: "hover:border-cyan-300", shine: "from-cyan-400/10" },
+                  { icon: TentTree, title: "Zone Ombra e Picnic", desc: "Aree attrezzate con tavoli per consumare comodamente il pranzo portato da casa.", bg: "bg-emerald-100", text: "text-emerald-700", glow: "hover:shadow-emerald-200/60", border: "hover:border-emerald-300", shine: "from-emerald-400/10" },
+                  { icon: Home, title: "Cabine Private", desc: "Cabine riservate per cambiarsi o depositare i propri effetti personali in sicurezza.", bg: "bg-blue-100", text: "text-blue-600", glow: "hover:shadow-blue-200/60", border: "hover:border-blue-300", shine: "from-blue-400/10" }
                 ].map((s, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 100, x: -50, rotate: -5 }}
-                    whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
+                    initial={{ opacity: 0, y: 60 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
-                    transition={{ 
-                      type: "spring",
-                      stiffness: 100,
-                      damping: 12,
-                      mass: 1,
-                      delay: index * 0.15 
-                    }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 text-center flex flex-col items-center relative overflow-hidden group"
+                    transition={{ type: "spring", stiffness: 90, damping: 14, delay: index * 0.1 }}
+                    whileHover={{ y: -10, scale: 1.03 }}
+                    className={`bg-white p-6 rounded-2xl shadow-sm border border-stone-200 ${s.border} ${s.glow} hover:shadow-xl text-center flex flex-col items-center relative overflow-hidden group cursor-default transition-all duration-300`}
                   >
-                    {/* Decorative wave hover effect on the card background */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                    
-                    <div className={`mx-auto w-12 h-12 ${s.bg} ${s.text} rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:-translate-y-2`}>
-                      <s.icon className="w-6 h-6" />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${s.shine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-stone-100 text-stone-400 text-[10px] font-black flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors duration-300">
+                      {index + 1}
                     </div>
+                    <motion.div
+                      whileHover={{ scale: 1.15 }}
+                      className={`w-14 h-14 ${s.bg} ${s.text} rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-300`}
+                    >
+                      <s.icon className="w-7 h-7" />
+                    </motion.div>
                     <h3 className="text-lg font-bold text-stone-900 mb-2 leading-tight relative z-10">{s.title}</h3>
                     <p className="text-stone-500 text-sm leading-relaxed relative z-10">{s.desc}</p>
                   </motion.div>
@@ -401,6 +400,7 @@ export default function App() {
           </div>
         </>
       )}
+
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="booking-section">
         <div className="flex justify-between items-center mb-8">
