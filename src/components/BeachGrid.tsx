@@ -71,9 +71,18 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
             <span className={clsx("font-bold text-xs md:text-sm tracking-wide leading-none", isSelected || umbrella.isSubscription ? "text-white" : "text-stone-800")}>
               {umbrella.zoneName}
             </span>
-            <span className={clsx("text-[9px] md:text-[10px] font-medium leading-none", isSelected || umbrella.isSubscription ? "text-emerald-100" : umbrella.isBooked ? "text-red-500" : "text-stone-500")}>
-              {umbrella.isBooked ? (umbrella.isSubscription ? "Abbonato" : "Esaurito") : `Disponibili: ${umbrella.availableQuantity}`}
-            </span>
+            {umbrella.isBooked ? (
+              <span className="mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                Esaurito
+              </span>
+            ) : (
+              <span className={clsx(
+                "mt-1 px-2 py-0.5 rounded-full text-[11px] font-black leading-none",
+                isSelected ? "bg-white/30 text-white" : "bg-emerald-100 text-emerald-800"
+              )}>
+                🏖️ {umbrella.availableQuantity} lettini liberi
+              </span>
+            )}
           </div>
         </motion.button>
       );
