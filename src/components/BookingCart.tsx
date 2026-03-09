@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, Mail, Phone, CreditCard, CheckCircle2, ShoppingCart } from 'lucide-react';
+import { Calendar, User, Mail, Phone, CreditCard, CheckCircle2, ShoppingCart, Wallet } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 import { Umbrella, Service } from '../types';
 import { PRICES } from '../constants';
 import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface CartItem {
   umbrella: Umbrella;
@@ -23,9 +24,10 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cassa'>('online');
+  const [isSubscription, setIsSubscription] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
     setCartItems(prev => {
@@ -43,7 +45,6 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
       });
       return newItems;
     });
-    setIsSuccess(false);
   }, [selectedUmbrellas]);
 
   const days = Math.max(1, differenceInDays(parseISO(endDate), parseISO(startDate)) + 1);
@@ -54,21 +55,21 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
     }
 
     let total = PRICES.umbrella * days;
-    
+
     let allServices: number[] = [];
     item.services.forEach(s => {
       for (let i = 0; i < s.quantity; i++) {
         allServices.push(PRICES[s.type]);
       }
     });
-    
+
     allServices.sort((a, b) => b - a);
     const extraServices = allServices.slice(2);
-    
+
     extraServices.forEach(price => {
       total += price * days;
     });
-    
+
     return total;
   };
 
@@ -98,20 +99,22 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
       const bookingsData = cartItems.map(item => ({
         row_number: item.umbrella.row,
         umbrella_number: item.umbrella.number,
+        zone_id: item.umbrella.zoneId,
+        quantity: item.umbrella.row === 0 ? (item.umbrella.selectedQuantity || 1) : 1,
         start_date: startDate,
         end_date: endDate,
         user_name: name,
         user_email: email,
         user_phone: phone,
         total_price: calculateItemTotal(item),
+        is_paid: false,
+        payment_method: paymentMethod,
+        is_subscription: isSubscription,
         services: item.services.filter(s => s.quantity > 0)
       }));
 
       await onBook(bookingsData);
-      setIsSuccess(true);
-      setTimeout(() => {
-        onCancel();
-      }, 3000);
+      // App.tsx handles success state via setSelectedUmbrellas([]) and showing the voucher
     } catch (error) {
       console.error(error);
       alert('Errore durante la prenotazione. Riprova.');
@@ -120,18 +123,14 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
     }
   };
 
-  if (isSuccess) {
-    return (
-      <div className="bg-green-50 rounded-2xl p-8 flex flex-col items-center text-center shadow-sm border border-green-100 mt-8">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
-        <h2 className="text-2xl font-bold text-green-900 mb-2">Prenotazione Confermata!</h2>
-        <p className="text-green-700">Grazie per aver scelto La Capannina. Ti aspettiamo!</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-stone-200 overflow-hidden mt-8" id="cart-section">
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 50 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="bg-white rounded-2xl shadow-md border border-stone-200 overflow-hidden mt-8" id="cart-section"
+    >
       <div className="bg-emerald-800 px-6 py-4 flex items-center justify-between text-white">
         <div className="flex items-center space-x-3">
           <ShoppingCart className="w-6 h-6 text-emerald-200" />
@@ -161,19 +160,63 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
               </div>
 
               {cartItems.map((item) => {
-                const displayNumber = item.umbrella.row === 0 ? item.umbrella.number : item.umbrella.number * 10 + item.umbrella.row;
+                const isRiva = item.umbrella.row === 0;
+                const displayNumber = isRiva ? item.umbrella.number : item.umbrella.number * 10 + item.umbrella.row;
+
                 return (
                   <div key={`${item.umbrella.row}-${item.umbrella.number}`} className="bg-white border border-stone-200 rounded-xl p-4 shadow-sm">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-bold text-stone-900">
-                        {item.umbrella.row === 0 ? `Lettino Riva N. ${displayNumber}` : `Ombrellone N. ${displayNumber} (Fila ${item.umbrella.row})`}
+                        {isRiva ? `${item.umbrella.zoneName}` : `Ombrellone N. ${displayNumber} (Fila ${item.umbrella.row})`}
                       </h3>
                       <button type="button" onClick={() => onRemoveItem(item.umbrella)} className="text-red-500 hover:text-red-700 text-sm font-medium">
                         Rimuovi
                       </button>
                     </div>
-                    
-                    {item.umbrella.row > 0 && (
+
+                    {isRiva ? (
+                      <div className="space-y-3">
+                        <p className="text-xs text-stone-500">Seleziona quanti lettini vuoi in questa zona.</p>
+                        <div className="flex items-center justify-between text-sm bg-stone-50 p-3 rounded-lg border border-stone-100">
+                          <span className="text-stone-700 font-medium">Numero Lettini ({PRICES.lettino_riva}€ l'uno)</span>
+                          <div className="flex items-center space-x-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCartItems(prev => prev.map(p => {
+                                  if (p.umbrella.row === item.umbrella.row && p.umbrella.number === item.umbrella.number) {
+                                    const currentQty = p.umbrella.selectedQuantity || 1;
+                                    if (currentQty > 1) {
+                                      return { ...p, umbrella: { ...p.umbrella, selectedQuantity: currentQty - 1 } };
+                                    }
+                                  }
+                                  return p;
+                                }));
+                              }}
+                              disabled={(item.umbrella.selectedQuantity || 1) <= 1}
+                              className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50"
+                            >-</button>
+                            <span className="w-6 text-center font-bold text-lg">{item.umbrella.selectedQuantity || 1}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCartItems(prev => prev.map(p => {
+                                  if (p.umbrella.row === item.umbrella.row && p.umbrella.number === item.umbrella.number) {
+                                    const currentQty = p.umbrella.selectedQuantity || 1;
+                                    if (currentQty < (p.umbrella.availableQuantity || 50)) {
+                                      return { ...p, umbrella: { ...p.umbrella, selectedQuantity: currentQty + 1 } };
+                                    }
+                                  }
+                                  return p;
+                                }));
+                              }}
+                              disabled={(item.umbrella.selectedQuantity || 1) >= (item.umbrella.availableQuantity || 50)}
+                              className="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50"
+                            >+</button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
                       <div className="space-y-3">
                         <p className="text-xs text-stone-500">2 servizi inclusi nel prezzo base.</p>
                         {[
@@ -255,6 +298,58 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
                     placeholder="+39 333 1234567"
                   />
                 </div>
+
+                <div className="space-y-1 bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between">
+                  <div className="flex flex-col">
+                     <label className="text-sm font-bold text-blue-900 flex items-center">
+                        Abbonamento Stagionale/Mensile
+                     </label>
+                     <p className="text-xs text-blue-700 mt-1">Prenota l'ombrellone per lungo periodo (verrà mostrato in blu).</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isSubscription}
+                    onChange={e => setIsSubscription(e.target.checked)}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-stone-200 mt-6">
+                  <label className="text-sm text-stone-700 font-bold block">Metodo di Pagamento</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('online')}
+                      className={clsx(
+                        "flex flex-col items-center justify-center space-y-2 p-4 rounded-xl border-2 transition-all",
+                        paymentMethod === 'online'
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-800 shadow-sm"
+                          : "border-stone-200 bg-white text-stone-600 hover:border-emerald-300"
+                      )}
+                    >
+                      <CreditCard className="w-6 h-6" />
+                      <span className="font-semibold text-sm">Paga Ora</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('cassa')}
+                      className={clsx(
+                        "flex flex-col items-center justify-center space-y-2 p-4 rounded-xl border-2 transition-all",
+                        paymentMethod === 'cassa'
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-800 shadow-sm"
+                          : "border-stone-200 bg-white text-stone-600 hover:border-emerald-300"
+                      )}
+                    >
+                      <Wallet className="w-6 h-6" />
+                      <span className="font-semibold text-sm">Paga in Cassa</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-2 text-center">
+                    {paymentMethod === 'online'
+                      ? "Paga in modo sicuro con la tua carta per confermare subito."
+                      : "La postazione è riservata per 30 minuti. Recati in cassa per pagare."}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -267,31 +362,35 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
           <p className="text-3xl font-bold text-stone-900">€{calculateTotal()}</p>
         </div>
         <div className="flex space-x-4 w-full sm:w-auto">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
             type="button"
             onClick={onCancel}
-            className="flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-stone-700 bg-white border border-stone-300 hover:bg-stone-50 transition-all shadow-sm"
+            className="flex-1 sm:flex-none px-6 py-3 rounded-xl font-semibold text-stone-700 bg-white border border-stone-300 hover:bg-stone-50 transition-colors shadow-sm"
           >
             Annulla
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
             type="submit"
             form="booking-form"
             disabled={isSubmitting}
             className={clsx(
-              "flex-1 sm:flex-none px-8 py-3 rounded-xl font-semibold text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg",
-              isSubmitting ? "bg-emerald-400 cursor-not-allowed" : "bg-emerald-700 hover:bg-emerald-800 active:scale-95"
+              "flex-1 sm:flex-none px-8 py-3 rounded-xl font-semibold text-white flex items-center justify-center transition-colors shadow-md",
+              isSubmitting ? "bg-emerald-400 cursor-not-allowed" : "bg-emerald-700 hover:bg-emerald-800"
             )}
           >
             {isSubmitting ? 'Elaborazione...' : (
               <>
-                <CreditCard className="w-5 h-5 mr-2" />
-                Conferma e Paga
+                {paymentMethod === 'online' ? <CreditCard className="w-5 h-5 mr-2" /> : <Wallet className="w-5 h-5 mr-2" />}
+                {paymentMethod === 'online' ? 'Conferma e Paga' : 'Prenota Postazione'}
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

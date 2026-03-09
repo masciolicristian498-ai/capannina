@@ -11,6 +11,8 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     row_number INTEGER NOT NULL,
     umbrella_number INTEGER NOT NULL,
+    zone_id TEXT,
+    quantity INTEGER DEFAULT 1,
     start_date TEXT NOT NULL,
     end_date TEXT NOT NULL,
     user_name TEXT NOT NULL,
@@ -18,6 +20,8 @@ db.exec(`
     user_phone TEXT NOT NULL,
     total_price REAL NOT NULL,
     is_paid BOOLEAN NOT NULL DEFAULT 0,
+    payment_method TEXT DEFAULT 'online',
+    checked_in BOOLEAN NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -30,6 +34,13 @@ db.exec(`
   );
 `);
 
+// Safe migrations: add new columns if db was created before this update
+const existingCols = (db.prepare("PRAGMA table_info(bookings)").all() as any[]).map((c: any) => c.name);
+if (!existingCols.includes('payment_method')) db.exec("ALTER TABLE bookings ADD COLUMN payment_method TEXT DEFAULT 'online'");
+if (!existingCols.includes('checked_in'))     db.exec("ALTER TABLE bookings ADD COLUMN checked_in BOOLEAN NOT NULL DEFAULT 0");
+if (!existingCols.includes('zone_id'))        db.exec("ALTER TABLE bookings ADD COLUMN zone_id TEXT");
+if (!existingCols.includes('quantity'))       db.exec("ALTER TABLE bookings ADD COLUMN quantity INTEGER DEFAULT 1");
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -37,22 +48,41 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
-  // API Routes
+  // GET bookings — supports date range filter, single-day filter, and name/email search
   app.get('/api/bookings', (req, res) => {
-    const { startDate, endDate } = req.query;
-    let query = 'SELECT * FROM bookings';
+    const { startDate, endDate, search, date } = req.query;
+    let query = 'SELECT * FROM bookings WHERE 1=1';
     const params: any[] = [];
 
     if (startDate && endDate) {
-      query += ' WHERE (start_date <= ? AND end_date >= ?)';
+      query += ' AND (start_date <= ? AND end_date >= ?)';
       params.push(endDate, startDate);
     }
 
+    // Specific day filter (for the admin "Today's arrivals" view)
+    if (date) {
+      query += ' AND start_date <= ? AND end_date >= ?';
+      params.push(date, date);
+    }
+
+    // Instant search by name or email
+    if (search) {
+      query += ' AND (user_name LIKE ? OR user_email LIKE ? OR user_phone LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
+
+    query += ' ORDER BY created_at DESC';
+
     const bookings = db.prepare(query).all(...params);
-    
+
     const bookingsWithServices = bookings.map((b: any) => {
-      const services = db.prepare('SELECT * FROM booking_services WHERE booking_id = ?').all(b.id);
-      return { ...b, services };
+      const services = db.prepare('SELECT service_type as type, quantity FROM booking_services WHERE booking_id = ?').all(b.id);
+      return {
+        ...b,
+        services,
+        is_paid: !!b.is_paid,
+        checked_in: !!b.checked_in,
+      };
     });
 
     res.json(bookingsWithServices);
@@ -75,8 +105,8 @@ async function startServer() {
     }
 
     const insertBooking = db.prepare(`
-      INSERT INTO bookings (row_number, umbrella_number, start_date, end_date, user_name, user_email, user_phone, total_price, is_paid)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+      INSERT INTO bookings (row_number, umbrella_number, zone_id, quantity, start_date, end_date, user_name, user_email, user_phone, total_price, is_paid, payment_method)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
     `);
 
     const insertService = db.prepare(`
@@ -87,7 +117,19 @@ async function startServer() {
     const transaction = db.transaction(() => {
       const bookingIds = [];
       for (const b of bookingsData) {
-        const info = insertBooking.run(b.row_number, b.umbrella_number, b.start_date, b.end_date, b.user_name, b.user_email, b.user_phone, b.total_price);
+        const info = insertBooking.run(
+          b.row_number,
+          b.umbrella_number,
+          b.zone_id ?? null,
+          b.quantity ?? 1,
+          b.start_date,
+          b.end_date,
+          b.user_name,
+          b.user_email,
+          b.user_phone,
+          b.total_price,
+          b.payment_method ?? 'online'
+        );
         const bookingId = info.lastInsertRowid;
         bookingIds.push(bookingId);
 
@@ -111,9 +153,17 @@ async function startServer() {
     }
   });
 
+  // Mark booking as paid (cassa payment confirmation)
   app.put('/api/bookings/:id/pay', (req, res) => {
     const { id } = req.params;
     db.prepare('UPDATE bookings SET is_paid = 1 WHERE id = ?').run(id);
+    res.json({ success: true });
+  });
+
+  // Mark booking as checked-in (customer arrived at the beach)
+  app.put('/api/bookings/:id/checkin', (req, res) => {
+    const { id } = req.params;
+    db.prepare('UPDATE bookings SET checked_in = 1 WHERE id = ?').run(id);
     res.json({ success: true });
   });
 
