@@ -56,7 +56,7 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError]   = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cassa'>('online');
-  const [isSubscription, setIsSubscription] = useState(false);
+
   const [cartItems, setCartItems]     = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -140,7 +140,7 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
         total_price:    calculateItemTotal(item),
         is_paid:        false,
         payment_method: paymentMethod,
-        is_subscription: isSubscription,
+        is_subscription: false,
         services:       item.services.filter(s => s.quantity > 0)
       }));
       await onBook(bookingsData);
@@ -333,16 +333,12 @@ export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onC
                   <p className="text-xs text-stone-400 mt-1">Inserisci il numero senza il prefisso. Verrà usato per inviarti la conferma.</p>
                 </div>
 
-                {/* Abbonamento */}
-                <div className="space-y-1 bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <label className="text-sm font-bold text-blue-900 flex items-center">
-                      Abbonamento Stagionale/Mensile
-                    </label>
-                    <p className="text-xs text-blue-700 mt-1">Prenota l'ombrellone per lungo periodo (verrà mostrato in blu).</p>
-                  </div>
-                  <input type="checkbox" checked={isSubscription} onChange={e => setIsSubscription(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                {/* Abbonamento - solo info */}
+                <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 flex items-start gap-3">
+                  <span className="text-amber-500 text-lg shrink-0">ℹ️</span>
+                  <p className="text-sm text-amber-800 font-medium leading-snug">
+                    Per <strong>abbonamento stagionale o mensile</strong>, chiedere direttamente in cassa.
+                  </p>
                 </div>
 
                 {/* Pagamento */}
