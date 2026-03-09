@@ -33,7 +33,9 @@ export default function App() {
         // Calculate how many lettini are booked in this zone for the selected period
         // For simplicity, we assume each booking for this zone_id adds to the booked quantity
         // Note: we need to handle quantity differently if it's multiple services per booking
-        const zoneBookings = bookings.filter(b => b.row_number === 0 && b.zone_id === zone.id);
+        // Filter by umbrella_number (1=A, 2=B, 3=C) because zone_id may be null in older records
+        const zoneUmbrellaNumber = index + 1;
+        const zoneBookings = bookings.filter(b => b.row_number === 0 && b.umbrella_number === zoneUmbrellaNumber);
         const bookedQuantity = zoneBookings.reduce((sum, b) => sum + (b.quantity || 1), 0);
 
         newUmbrellas.push({
