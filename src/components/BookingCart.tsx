@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, Mail, Phone, CreditCard, ShoppingCart, Wallet, AlertCircle, Trash2, Waves } from 'lucide-react';
+import { Calendar, User, Mail, Phone, CreditCard, ShoppingCart, Wallet, AlertCircle } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 import { Umbrella, Service } from '../types';
-import { PRICES, POOL } from '../constants';
+import { PRICES } from '../constants';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -42,16 +42,14 @@ interface CartItem {
 
 interface BookingCartProps {
   selectedUmbrellas: Umbrella[];
-  poolCart: { people: number } | null;
   startDate: string;
   endDate: string;
   onBook: (bookings: any[]) => Promise<void>;
   onCancel: () => void;
   onRemoveItem: (umbrella: Umbrella) => void;
-  onRemovePool: () => void;
 }
 
-export function BookingCart({ selectedUmbrellas, poolCart, startDate, endDate, onBook, onCancel, onRemoveItem, onRemovePool }: BookingCartProps) {
+export function BookingCart({ selectedUmbrellas, startDate, endDate, onBook, onCancel, onRemoveItem }: BookingCartProps) {
   const [name, setName]               = useState('');
   const [email, setEmail]             = useState('');
   const [phonePrefix, setPhonePrefix] = useState('+39');
@@ -112,11 +110,7 @@ export function BookingCart({ selectedUmbrellas, poolCart, startDate, endDate, o
     return total;
   };
 
-  const calculateTotal = () => {
-    const beachTotal = cartItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
-    const poolTotal = poolCart ? poolCart.people * POOL.pricePerPerson * days : 0;
-    return beachTotal + poolTotal;
-  };
+  const calculateTotal = () => cartItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
 
   const updateService = (umbrella: Umbrella, type: Service['type'], delta: number) => {
     setCartItems(prev => prev.map(item => {
@@ -149,25 +143,6 @@ export function BookingCart({ selectedUmbrellas, poolCart, startDate, endDate, o
         is_subscription: false,
         services:       item.services.filter(s => s.quantity > 0)
       }));
-      // Add pool booking if present
-      if (poolCart) {
-        bookingsData.push({
-          row_number:      POOL.ROW_NUMBER,
-          umbrella_number: POOL.UMBRELLA_NUMBER,
-          zone_id:         'POOL',
-          quantity:        poolCart.people,
-          start_date:      startDate,
-          end_date:        endDate,
-          user_name:       name,
-          user_email:      email,
-          user_phone:      fullPhone,
-          total_price:     poolCart.people * POOL.pricePerPerson * days,
-          is_paid:         false,
-          payment_method:  paymentMethod,
-          is_subscription: false,
-          services:        [],
-        } as any);
-      }
       await onBook(bookingsData);
     } catch (error) {
       console.error(error);
@@ -192,7 +167,7 @@ export function BookingCart({ selectedUmbrellas, poolCart, startDate, endDate, o
           <div>
             <h2 className="text-xl font-bold">Carrello del tuo posto al sole</h2>
             <p className="text-emerald-100 text-sm">
-              {cartItems.length + (poolCart ? 1 : 0)} {(cartItems.length + (poolCart ? 1 : 0)) === 1 ? 'articolo' : 'articoli'} nel carrello
+              {cartItems.length} {cartItems.length === 1 ? 'postazione selezionata' : 'postazioni selezionate'}
             </p>
           </div>
         </div>
@@ -213,26 +188,6 @@ export function BookingCart({ selectedUmbrellas, poolCart, startDate, endDate, o
                   </p>
                 </div>
               </div>
-
-              {/* Pool Card in Cart */}
-              {poolCart && (
-                <div className="bg-cyan-50 border-2 border-cyan-200 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 font-bold text-cyan-800">
-                      <Waves className="w-5 h-5" /> Area Piscina
-                    </div>
-                    <button type="button" onClick={onRemovePool} className="text-red-400 hover:text-red-600 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <p className="text-sm text-cyan-700">
-                    {poolCart.people} {poolCart.people === 1 ? 'persona' : 'persone'} × {days} {days === 1 ? 'giorno' : 'giorni'} × €{POOL.pricePerPerson}
-                  </p>
-                  <p className="text-right font-semibold text-cyan-900 mt-1">
-                    Subtotale: €{poolCart.people * POOL.pricePerPerson * days}
-                  </p>
-                </div>
-              )}
 
 
               {cartItems.map((item) => {

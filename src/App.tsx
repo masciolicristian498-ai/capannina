@@ -23,7 +23,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [voucherData, setVoucherData] = useState<any>(null);
   const [poolAvailable, setPoolAvailable] = useState(POOL.maxCapacity);
-  const [poolCart, setPoolCart] = useState<{ people: number } | null>(null);
 
   const fetchAvailability = async () => {
     setLoading(true);
@@ -87,13 +86,7 @@ export default function App() {
   useEffect(() => {
     fetchAvailability();
     setSelectedUmbrellas([]);
-    setPoolCart(null);
   }, [startDate, endDate]);
-
-  const handlePoolAddToCart = (people: number) => {
-    setPoolCart({ people });
-    setTimeout(() => document.getElementById('cart-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
-  };
 
   const handleToggleSelect = (umbrella: Umbrella) => {
     setSelectedUmbrellas(prev => {
@@ -133,7 +126,6 @@ export default function App() {
     });
     
     setSelectedUmbrellas([]);
-    setPoolCart(null);
   };
 
   const scrollToBooking = () => {
@@ -488,20 +480,11 @@ export default function App() {
             )}
 
             {/* Pool Section */}
-            {!loading && (
-              <PoolSection
-                startDate={startDate}
-                endDate={endDate}
-                availableSpots={poolAvailable}
-                onAddToCart={handlePoolAddToCart}
-                alreadyInCart={poolCart !== null}
-                peopleInCart={poolCart?.people ?? 0}
-              />
-            )}
+            {!loading && <PoolSection />}
 
             {/* AnimatePresence for the Booking Cart mounting/unmounting */}
             <AnimatePresence>
-              {(selectedUmbrellas.length > 0 || poolCart !== null) && !isAdmin && (
+              {selectedUmbrellas.length > 0 && !isAdmin && (
                 <motion.div
                   key="booking-cart-wrapper"
                   initial={{ opacity: 0 }}
@@ -510,13 +493,11 @@ export default function App() {
                 >
                   <BookingCart
                     selectedUmbrellas={selectedUmbrellas}
-                    poolCart={poolCart}
                     startDate={startDate}
                     endDate={endDate}
-                    onCancel={() => { setSelectedUmbrellas([]); setPoolCart(null); }}
+                    onCancel={() => setSelectedUmbrellas([])}
                     onBook={handleBook}
                     onRemoveItem={handleToggleSelect}
-                    onRemovePool={() => setPoolCart(null)}
                   />
                 </motion.div>
               )}
