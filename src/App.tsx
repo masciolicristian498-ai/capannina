@@ -5,6 +5,7 @@ import { BookingCart } from './components/BookingCart';
 import { AdminPanel } from './components/AdminPanel';
 import { SuccessVoucher } from './components/SuccessVoucher';
 import { BeachSkeleton } from './components/BeachSkeleton';
+import { MyBookings } from './components/MyBookings';
 import { Umbrella, Booking } from './types';
 import { ROWS, UMBRELLAS_PER_ROW, RIVA_ZONES } from './constants';
 import { format, addDays } from 'date-fns';
@@ -13,6 +14,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'my-bookings'>('home');
   const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [endDate, setEndDate] = useState(format(addDays(new Date(), 7), 'yyyy-MM-dd'));
   const [umbrellas, setUmbrellas] = useState<Umbrella[]>([]);
@@ -123,9 +125,17 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
-      <Header />
+      <Header currentPage={currentPage} onNavigate={(page) => { setCurrentPage(page); setIsAdmin(false); }} />
 
-      {!isAdmin && (
+      {/* ── Le Mie Prenotazioni ── */}
+      {currentPage === 'my-bookings' && (
+        <main>
+          <MyBookings />
+        </main>
+      )}
+
+      {/* ── Home / Spiaggia ── */}
+      {currentPage === 'home' && (
         <>
           {/* Hero Section */}
           <div className="relative bg-emerald-900 overflow-hidden">

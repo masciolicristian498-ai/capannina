@@ -191,6 +191,7 @@ async function startServer() {
     res.json({ success: true });
   });
 
+  // Delete booking
   app.delete('/api/bookings/:id', (req, res) => {
     const { id } = req.params;
     db.transaction(() => {
@@ -199,6 +200,34 @@ async function startServer() {
     })();
     res.json({ success: true });
   });
+
+  // Get bookings by email or phone (for "Le mie prenotazioni" feature)
+  app.get('/api/my-bookings', (req, res) => {
+    const { email, phone } = req.query;
+    if (!email && !phone) {
+      return res.status(400).json({ error: 'Inserisci email o numero di telefono' });
+    }
+    let query = 'SELECT * FROM bookings WHERE 1=0';
+    const params: any[] = [];
+    if (email) {
+      query = 'SELECT * FROM bookings WHERE LOWER(user_email) = LOWER(?)';
+      params.push(email);
+    } else if (phone) {
+      // Match on the last digits to handle prefix variations (+39 333... vs 333...)
+      const digits = String(phone).replace(/\D/g, '').slice(-9);
+      query = `SELECT * FROM bookings WHERE REPLACE(REPLACE(REPLACE(user_phone,' ',''),'-',''),'+','') LIKE ?`;
+      params.push(`%${digits}`);
+    }
+    query += ' ORDER BY start_date DESC';
+    const bookings = db.prepare(query).all(...params);
+    const bookingsWithServices = bookings.map((b: any) => {
+      const services = db.prepare('SELECT service_type as type, quantity FROM booking_services WHERE booking_id = ?').all(b.id);
+      return { ...b, services, is_paid: !!b.is_paid, checked_in: !!b.checked_in };
+    });
+    res.json(bookingsWithServices);
+  });
+
+
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
