@@ -6,9 +6,10 @@ import { AdminPanel } from './components/AdminPanel';
 import { SuccessVoucher } from './components/SuccessVoucher';
 import { BeachSkeleton } from './components/BeachSkeleton';
 import { MyBookings } from './components/MyBookings';
+import { PoolSection } from './components/PoolSection';
 import { Umbrella, Booking } from './types';
-import { ROWS, UMBRELLAS_PER_ROW, RIVA_ZONES } from './constants';
-import { format, addDays } from 'date-fns';
+import { ROWS, UMBRELLAS_PER_ROW, RIVA_ZONES, POOL } from './constants';
+import { format, addDays, differenceInDays, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, ShieldAlert, ChevronDown, Coffee, Sun, TentTree, Droplets, Home, Cloud, Star, Anchor, Fish } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -21,6 +22,8 @@ export default function App() {
   const [selectedUmbrellas, setSelectedUmbrellas] = useState<Umbrella[]>([]);
   const [loading, setLoading] = useState(true);
   const [voucherData, setVoucherData] = useState<any>(null);
+  const [poolAvailable, setPoolAvailable] = useState(POOL.maxCapacity);
+  const [poolCart, setPoolCart] = useState<{ people: number } | null>(null);
 
   const fetchAvailability = async () => {
     setLoading(true);
@@ -67,6 +70,13 @@ export default function App() {
         }
       }
       setUmbrellas(newUmbrellas);
+
+      // Pool availability (row_number = -1)
+      const poolBooked = bookings
+        .filter(b => b.row_number === -1)
+        .reduce((sum, b) => sum + (b.quantity || 1), 0);
+      setPoolAvailable(Math.max(0, POOL.maxCapacity - poolBooked));
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -77,7 +87,13 @@ export default function App() {
   useEffect(() => {
     fetchAvailability();
     setSelectedUmbrellas([]);
+    setPoolCart(null);
   }, [startDate, endDate]);
+
+  const handlePoolAddToCart = (people: number) => {
+    setPoolCart({ people });
+    setTimeout(() => document.getElementById('cart-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
+  };
 
   const handleToggleSelect = (umbrella: Umbrella) => {
     setSelectedUmbrellas(prev => {
@@ -117,6 +133,7 @@ export default function App() {
     });
     
     setSelectedUmbrellas([]);
+    setPoolCart(null);
   };
 
   const scrollToBooking = () => {
@@ -470,9 +487,21 @@ export default function App() {
               </div>
             )}
 
+            {/* Pool Section */}
+            {!loading && (
+              <PoolSection
+                startDate={startDate}
+                endDate={endDate}
+                availableSpots={poolAvailable}
+                onAddToCart={handlePoolAddToCart}
+                alreadyInCart={poolCart !== null}
+                peopleInCart={poolCart?.people ?? 0}
+              />
+            )}
+
             {/* AnimatePresence for the Booking Cart mounting/unmounting */}
             <AnimatePresence>
-              {selectedUmbrellas.length > 0 && !isAdmin && (
+              {(selectedUmbrellas.length > 0 || poolCart !== null) && !isAdmin && (
                 <motion.div
                   key="booking-cart-wrapper"
                   initial={{ opacity: 0 }}
@@ -481,11 +510,13 @@ export default function App() {
                 >
                   <BookingCart
                     selectedUmbrellas={selectedUmbrellas}
+                    poolCart={poolCart}
                     startDate={startDate}
                     endDate={endDate}
-                    onCancel={() => setSelectedUmbrellas([])}
+                    onCancel={() => { setSelectedUmbrellas([]); setPoolCart(null); }}
                     onBook={handleBook}
                     onRemoveItem={handleToggleSelect}
+                    onRemovePool={() => setPoolCart(null)}
                   />
                 </motion.div>
               )}

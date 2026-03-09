@@ -93,7 +93,23 @@ async function startServer() {
 
     // Check availability
     for (const b of bookingsData) {
-      if (b.row_number === 0) {
+      if (b.row_number === -1) {
+        // Pool: check total booked people vs max capacity (80)
+        const POOL_MAX = 80;
+        const result = db.prepare(`
+          SELECT COALESCE(SUM(quantity), 0) as booked
+          FROM bookings 
+          WHERE row_number = -1
+          AND (start_date <= ? AND end_date >= ?)
+        `).get(b.end_date, b.start_date) as any;
+        const alreadyBooked = result?.booked ?? 0;
+        const requested = b.quantity ?? 1;
+        if (alreadyBooked + requested > POOL_MAX) {
+          return res.status(400).json({
+            error: `Piscina esaurita per queste date. Posti rimasti: ${POOL_MAX - alreadyBooked}.`
+          });
+        }
+      } else if (b.row_number === 0) {
         // Riva zone: check total booked quantity vs max capacity (50 per zone)
         const RIVA_MAX_CAPACITY = 50;
         const result = db.prepare(`
@@ -102,10 +118,8 @@ async function startServer() {
           WHERE row_number = 0 AND umbrella_number = ? 
           AND (start_date <= ? AND end_date >= ?)
         `).get(b.umbrella_number, b.end_date, b.start_date) as any;
-
         const alreadyBooked = result?.booked ?? 0;
         const requestedQty = b.quantity ?? 1;
-
         if (alreadyBooked + requestedQty > RIVA_MAX_CAPACITY) {
           return res.status(400).json({ 
             error: `Zona Riva ${b.zone_id} esaurita per queste date. Disponibili: ${RIVA_MAX_CAPACITY - alreadyBooked} lettini.` 
@@ -118,7 +132,6 @@ async function startServer() {
           WHERE row_number = ? AND umbrella_number = ? 
           AND (start_date <= ? AND end_date >= ?)
         `).get(b.row_number, b.umbrella_number, b.end_date, b.start_date);
-
         if (existing) {
           return res.status(400).json({ 
             error: `Ombrellone N.${b.umbrella_number * 10 + b.row_number} già prenotato per queste date` 
@@ -126,6 +139,7 @@ async function startServer() {
         }
       }
     }
+
 
 
     const insertBooking = db.prepare(`
