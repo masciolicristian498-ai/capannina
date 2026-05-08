@@ -361,9 +361,14 @@ export default function App() {
 
       {/* Booking Section */}
       {currentPage === 'home' && (
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="booking-section">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold text-emerald-900 tracking-tight">
+            <main
+              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+              id="booking-section"
+              style={{ height: 'calc(100vh - 4rem)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+            >
+              {/* Title + Admin toggle */}
+              <div className="flex justify-between items-center mb-4 shrink-0">
+                <h2 className="text-2xl font-bold text-emerald-900 tracking-tight">
                   {isAdmin ? 'Gestione Stabilimento' : 'Prenota il tuo posto al sole'}
                 </h2>
                 <button
@@ -376,101 +381,107 @@ export default function App() {
               </div>
 
               {isAdmin ? (
-                <AdminPanel />
+                <div className="flex-1 overflow-y-auto">
+                  <AdminPanel />
+                </div>
               ) : (
-                <div className="space-y-8">
-                  {/* Date Picker Section */}
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100 flex flex-col md:flex-row md:items-end gap-6">
-                    <div className="flex-1 space-y-2">
-                      <label className="text-sm font-semibold text-emerald-800 flex items-center">
-                        <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
-                        Data Arrivo
-                      </label>
+                <div className="flex flex-col flex-1 min-h-0 gap-4">
+                  {/* Date Picker — compact, fixed height */}
+                  <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-emerald-100 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-2 flex-1">
+                      <CalendarIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <label className="text-xs font-semibold text-emerald-800 whitespace-nowrap">Arrivo</label>
                       <input
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
+                        className="flex-1 px-3 py-1.5 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none text-stone-700 font-medium text-sm"
                       />
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <label className="text-sm font-semibold text-emerald-800 flex items-center">
-                        <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
-                        Data Partenza
-                      </label>
+                    <div className="flex items-center gap-2 flex-1">
+                      <CalendarIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <label className="text-xs font-semibold text-emerald-800 whitespace-nowrap">Partenza</label>
                       <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         min={startDate}
-                        className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
+                        className="flex-1 px-3 py-1.5 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none text-stone-700 font-medium text-sm"
                       />
                     </div>
-                    <div className="flex-none">
-                      <button
-                        onClick={fetchAvailability}
-                        className="w-full md:w-auto px-8 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
-                      >
-                        Verifica Disponibilità
-                      </button>
-                    </div>
+                    <button
+                      onClick={fetchAvailability}
+                      className="shrink-0 px-6 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 text-sm"
+                    >
+                      Verifica Disponibilità
+                    </button>
                   </div>
 
-                  {/* Beach Grid */}
+                  {/* Beach Grid — fills remaining vertical space, horizontal scroll only */}
                   {loading ? (
                     <BeachSkeleton />
                   ) : (
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                        <h3 className="text-xl font-bold text-emerald-900">Mappa Spiaggia</h3>
-                        <div className="flex flex-wrap gap-3 md:gap-4 text-xs md:text-sm font-medium">
-                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-100 border border-emerald-300 mr-1.5 shadow-sm"></span> Libero</div>
-                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-red-100 border border-red-300 mr-1.5 shadow-sm"></span> Occupato</div>
-                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1.5 shadow-sm"></span> Abbonato</div>
-                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-700 mr-1.5 shadow-sm"></span> Selezionato</div>
+                    <div className="bg-white rounded-2xl shadow-sm border border-emerald-100 flex flex-col flex-1 min-h-[280px] overflow-hidden">
+                      {/* Header row */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-2 gap-2 border-b border-emerald-50 shrink-0">
+                        <h3 className="text-sm font-bold text-emerald-900">🗺️ Mappa Spiaggia</h3>
+                        <div className="flex flex-wrap gap-2.5 text-xs font-medium">
+                          <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-100 border border-emerald-300 mr-1"></span>Libero</div>
+                          <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-red-100 border border-red-300 mr-1"></span>Occupato</div>
+                          <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 mr-1"></span>Abbonato</div>
+                          <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-700 mr-1"></span>Selezionato</div>
                         </div>
                       </div>
-                      <BeachGrid
-                        umbrellas={umbrellas}
-                        onToggleSelect={handleToggleSelect}
-                        selectedUmbrellas={selectedUmbrellas}
-                      />
+                      {/* Grid — overflow-y auto (scrolls inside card), overflow-x auto */}
+                      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
+                        <BeachGrid
+                          umbrellas={umbrellas}
+                          onToggleSelect={handleToggleSelect}
+                          selectedUmbrellas={selectedUmbrellas}
+                        />
+                      </div>
                     </div>
                   )}
-
-                  {/* Pool Section */}
-                  {!loading && <PoolSection />}
-
-                  {/* AnimatePresence for the Booking Cart mounting/unmounting */}
-                  <AnimatePresence>
-                    {selectedUmbrellas.length > 0 && !isAdmin && (
-                      <motion.div
-                        key="booking-cart-wrapper"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                      >
-                        <BookingCart
-                          selectedUmbrellas={selectedUmbrellas}
-                          startDate={startDate}
-                          endDate={endDate}
-                          onCancel={() => setSelectedUmbrellas([])}
-                          onBook={handleBook}
-                          onRemoveItem={handleToggleSelect}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               )}
-
-              <SuccessVoucher
-                isOpen={!!voucherData}
-                onClose={() => setVoucherData(null)}
-                bookingDetails={voucherData || { userName: '', userEmail: '', userPhone: '', startDate: '', endDate: '', umbrellas: [] }}
-              />
             </main>
           )}
+
+          {/* Pool + Cart sections — scroll naturally below the beach map */}
+          {currentPage === 'home' && !isAdmin && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 space-y-8">
+              {/* Pool Section */}
+              {!loading && <PoolSection />}
+
+              {/* Booking Cart */}
+              <AnimatePresence>
+                {selectedUmbrellas.length > 0 && (
+                  <motion.div
+                    key="booking-cart-wrapper"
+                    id="cart-section"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <BookingCart
+                      selectedUmbrellas={selectedUmbrellas}
+                      startDate={startDate}
+                      endDate={endDate}
+                      onCancel={() => setSelectedUmbrellas([])}
+                      onBook={handleBook}
+                      onRemoveItem={handleToggleSelect}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          <SuccessVoucher
+            isOpen={!!voucherData}
+            onClose={() => setVoucherData(null)}
+            bookingDetails={voucherData || { userName: '', userEmail: '', userPhone: '', startDate: '', endDate: '', umbrellas: [] }}
+          />
         </div>
       );
     }
