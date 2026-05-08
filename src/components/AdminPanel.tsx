@@ -19,6 +19,9 @@ function formatPostazione(b: Booking) {
     const zone = b.zone_id ? `Zona ${b.zone_id}` : `Lettino N.${b.umbrella_number}`;
     return `Riva – ${zone}${b.quantity && b.quantity > 1 ? ` (×${b.quantity})` : ''}`;
   }
+  if (b.row_number === -1) {
+    return `Area Piscina${b.quantity && b.quantity > 1 ? ` (×${b.quantity} ingressi)` : ''}`;
+  }
   return `Fila ${b.row_number}, N.${b.umbrella_number * 10 + b.row_number}`;
 }
 
@@ -283,12 +286,10 @@ export function AdminPanel() {
                         ) : (
                           <span className={clsx(
                             "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium",
-                            booking.is_paid
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-stone-100 text-stone-500"
+                            "bg-emerald-100 text-emerald-700"
                           )}>
                             <CreditCard className="w-3 h-3" />
-                            Online
+                            Online – Pagato
                           </span>
                         )}
                       </td>
@@ -312,7 +313,7 @@ export function AdminPanel() {
                           </span>
                         )}
                         <div className="mt-1">
-                          {booking.is_paid ? (
+                          {(booking.is_paid || booking.payment_method !== 'cassa') ? (
                             <span className="inline-flex items-center gap-1 text-emerald-600 text-xs">
                               <CheckCircle className="w-3.5 h-3.5" /> Pagato
                             </span>

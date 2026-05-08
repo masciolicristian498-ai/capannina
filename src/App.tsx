@@ -7,11 +7,11 @@ import { SuccessVoucher } from './components/SuccessVoucher';
 import { BeachSkeleton } from './components/BeachSkeleton';
 import { MyBookings } from './components/MyBookings';
 import { PoolSection } from './components/PoolSection';
-import { InteractiveBeach3D } from './components/InteractiveBeach3D';
+import { ServiceCards } from './components/ServiceCards';
 import { Umbrella, Booking } from './types';
 import { ROWS, UMBRELLAS_PER_ROW, RIVA_ZONES, POOL } from './constants';
-import { format, addDays, differenceInDays, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, ShieldAlert, ChevronDown, Cloud, Star, Anchor, Fish, TentTree, Home } from 'lucide-react';
+import { format, addDays } from 'date-fns';
+import { Calendar as CalendarIcon, ShieldAlert, ChevronDown, Cloud, Star, Anchor, Fish } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
@@ -113,19 +113,19 @@ export default function App() {
     }
 
     await fetchAvailability();
-    
+
     setVoucherData({
       userName: bookingData[0].user_name,
       userEmail: bookingData[0].user_email,
       userPhone: bookingData[0].user_phone,
       startDate: bookingData[0].start_date,
       endDate: bookingData[0].end_date,
-      umbrellas: bookingData.map((b: any) => ({ 
-        row: b.row_number, 
-        number: b.umbrella_number 
+      umbrellas: bookingData.map((b: any) => ({
+        row: b.row_number,
+        number: b.umbrella_number
       }))
     });
-    
+
     setSelectedUmbrellas([]);
   };
 
@@ -145,69 +145,48 @@ export default function App() {
       )}
 
       {/* ── Home / Spiaggia ── */}
-      {currentPage === 'home' && (
+      {currentPage === 'home' && !isAdmin && (
         <>
-          <div className="relative bg-emerald-900 overflow-hidden">
-            <div className="absolute inset-0">
-              <motion.img
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
+          {/* Hero Section */}
+          <div className="relative h-screen flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 z-0">
+              <img
                 src="/capannina-sunset.png"
-                alt="Spiaggia La Capannina al Tramonto"
-                className="w-full h-full object-cover opacity-40"
-                referrerPolicy="no-referrer"
+                alt="Spiaggia La Capannina Sunset"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 to-transparent" />
+              <div className="absolute inset-0 bg-emerald-900/70" />
             </div>
 
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 flex flex-col lg:flex-row items-center justify-between gap-12">
-              {/* Text side */}
-              <div className="text-center lg:text-left flex-1 z-10">
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6"
-                >
-                  Benvenuti a La Capannina
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="mt-4 max-w-2xl text-xl text-emerald-100 mb-10"
-                >
-                  Il tuo angolo di paradiso a Lavinio. Sabbia finissima, mare cristallino e tutti i comfort per una giornata indimenticabile.
-                </motion.p>
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.8, type: "spring", stiffness: 200 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={scrollToBooking}
-                  className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-emerald-900 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 shadow-xl"
-                >
-                  Prenota Ora
-                  <motion.div
-                    animate={{ y: [0, 5, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                  >
-                    <ChevronDown className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
-                  </motion.div>
-                </motion.button>
-              </div>
-
-              {/* 3D Beach Scene - hidden on mobile */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85, x: 60 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.5, type: "spring", stiffness: 80 }}
-                className="hidden lg:block flex-1 max-w-md h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-black/10 backdrop-blur-sm z-10"
+            <div className="relative z-10 text-center px-4">
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg"
               >
-                <InteractiveBeach3D />
-              </motion.div>
+                Benvenuti a <span className="text-emerald-700">La Capannina</span>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-md font-medium"
+              >
+                Il tuo angolo di paradiso a Lavinio. Sabbia finissima, mare cristallino e tutti i comfort per una giornata indimenticabile.
+              </motion.p>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4, type: "spring", stiffness: 200 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={scrollToBooking}
+                className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-emerald-950 bg-white hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white shadow-xl"
+              >
+                Prenota Ora
+                <ChevronDown className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+              </motion.button>
             </div>
 
             {/* Clouds */}
@@ -219,375 +198,279 @@ export default function App() {
               >
                 <Cloud className="w-24 h-24 text-white/20" />
               </motion.div>
-              <motion.div
-                className="absolute top-24 right-[50%]"
-                animate={{ x: [0, -80, 0] }}
-                transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              >
-                <Cloud className="w-32 h-32 text-white/15" />
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Chi Siamo Section with Ambient Elements */}
-          <div className="bg-white py-16 lg:py-24 border-b border-stone-100 relative overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none z-10">
-               <motion.div
-                 className="absolute top-10 right-[5%] drop-shadow-sm"
-                 animate={{ rotate: 360 }}
-                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-               >
-                 <Star className="w-24 h-24 text-red-400 fill-red-300/80" />
-               </motion.div>
-               <motion.div
-                 className="absolute bottom-20 left-[2%] drop-shadow-sm"
-                 animate={{ rotate: -360 }}
-                 transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-               >
-                 <Anchor className="w-32 h-32 text-slate-800 opacity-20" />
-               </motion.div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-              <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-                <motion.div 
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                  className="mb-10 lg:mb-0"
-                >
-                  <h2 className="text-3xl font-bold text-emerald-900 mb-6 tracking-tight">Vivi l'estate perfetta con noi</h2>
-                  <p className="text-lg text-stone-600 mb-4 leading-relaxed">
-                    Da oltre trent'anni La Capannina è il punto di riferimento a Lavinio per chi cerca una vacanza all'insegna del puro relax e del divertimento in un ambiente curato e familiare.
-                  </p>
-                  <p className="text-lg text-stone-600 leading-relaxed">
-                    Gestito con passione, il nostro stabilimento dispone della rinomata e modernissima "Area Riva" direttamente a contatto col bagnasciuga, e un'organizzazione su file che garantisce privacy e tranquillità. Potrai degustare ottimi stuzzichini sotto l'ombrellone o nel nostro bar centrale.
-                  </p>
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                  className="relative rounded-2xl overflow-hidden shadow-2xl"
-                >
-                  <img 
-                    src="/capannina-sunset.png" 
-                    alt="Il nostro lido al tramonto" 
-                    className="w-full h-80 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-emerald-900/10 pointer-events-none"></div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-
-          {/* I Nostri Servizi Section with Ambient Elements */}
-          <div className="bg-gradient-to-b from-stone-50 to-emerald-50/30 py-16 lg:py-24 relative overflow-hidden">
-             
-             {/* Floating Fishes & Bubbles (z-0 to ensure they stay strictly IN BACK of the cards) */}
-             <div className="absolute inset-0 pointer-events-none z-0">
-               {/* Textured Bubbles */}
-               {[...Array(8)].map((_, i) => (
-                 <motion.div
-                   key={`bubble-${i}`}
-                   className="absolute rounded-full"
-                   style={{
-                     left: `${10 + (i * 12)}%`,
-                     width: `${8 + (Math.random() * 24)}px`,
-                     height: `${8 + (Math.random() * 24)}px`,
-                     background: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(110, 231, 183, 0.2), rgba(16, 185, 129, 0.1))',
-                     boxShadow: 'inset 2px 2px 4px rgba(255, 255, 255, 0.6), inset -2px -2px 4px rgba(16, 185, 129, 0.2)',
-                     border: '1px solid rgba(255, 255, 255, 0.4)'
-                   }}
-                   initial={{ bottom: '-10%', opacity: 0 }}
-                   animate={{ 
-                     bottom: '120%', 
-                     opacity: [0, 0.9, 0],
-                     x: [0, Math.random() > 0.5 ? 30 : -30, 0] 
-                   }}
-                   transition={{ 
-                     duration: 4 + Math.random() * 6, 
-                     repeat: Infinity, 
-                     ease: "linear",
-                     delay: Math.random() * 5
-                   }}
-                 />
-               ))}
-
-             </div>
-             {/* Wrapper with overflow-hidden to prevent fishes from causing horizontal scroll */}
-             <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
-               {/* Original Cute Fishes Placed in Empty Spaces */}
-               <motion.div
-                 className="absolute top-8 left-[-10%]"
-                 animate={{ x: ['0vw', '110vw'], y: [0, -10, 0] }}
-                 transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-               >
-                 {/* Swims right -> normal orientation because Lucide Fish faces right by default */}
-                 <Fish className="w-12 h-12 text-orange-400 fill-orange-300 drop-shadow-md opacity-80" />
-               </motion.div>
-
-               <motion.div
-                 className="absolute top-16 right-[-10%]"
-                 animate={{ x: ['10vw', '-110vw'], y: [0, 15, 0] }}
-                 transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 2 }}
-               >
-                 {/* Swims left -> needs scaleX(-1) to flip it */}
-                 <Fish className="w-10 h-10 text-blue-400 fill-blue-300 drop-shadow-md opacity-70 transform -scale-x-100" />
-               </motion.div>
-
-               <motion.div
-                 className="absolute bottom-8 right-[-10%]"
-                 animate={{ x: ['10vw', '-110vw'], y: [0, -10, 0] }}
-                 transition={{ duration: 22, repeat: Infinity, ease: "linear", delay: 8 }}
-               >
-                 {/* Swims left -> needs scaleX(-1) to flip it */}
-                 <Fish className="w-14 h-14 text-emerald-500 fill-emerald-400 drop-shadow-lg opacity-80 transform -scale-x-100" />
-               </motion.div>
-             </div>
-             
-             {/* Animated Sweeping Wave for Services */}
-             <div className="absolute inset-x-0 bottom-0 h-80 overflow-hidden pointer-events-none z-0 opacity-80">
-               <motion.svg 
-                 viewBox="0 0 1200 120" 
-                 preserveAspectRatio="none" 
-                 className="absolute bottom-0 w-[200%] h-full fill-emerald-200/80"
-                 animate={{ x: ['0%', '-50%'] }}
-                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-               >
-                 <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C79.44,115.54,166.7,126.91,245.8,111.45A651.92,651.92,0,0,0,321.39,56.44Z" />
-               </motion.svg>
-               {/* Second wave layer for more depth */}
-               <motion.svg 
-                 viewBox="0 0 1200 120" 
-                 preserveAspectRatio="none" 
-                 className="absolute bottom-0 w-[200%] h-3/4 fill-emerald-300/60"
-                 animate={{ x: ['-50%', '0%'] }}
-                 transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-               >
-                 <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C79.44,115.54,166.7,126.91,245.8,111.45A651.92,651.92,0,0,0,321.39,56.44Z" />
-               </motion.svg>
-             </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-emerald-900 tracking-tight">I Nostri Servizi</h2>
-                <p className="mt-4 text-lg text-stone-600">Tutto ciò di cui hai bisogno per la tua giornata ideale.</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                {[
-                  {
-                    title: "Lettini e Ombrelloni",
-                    desc: "Attrezzature comode per il tuo relax al mare.",
-                    glow: "hover:shadow-orange-200/60", border: "hover:border-orange-300", shine: "from-orange-400/10",
-                    svg: (
-                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 8 Q8 20 8 32 Q16 26 24 32 Q32 26 40 32 Q40 20 24 8Z" fill="#fb923c" opacity="0.9"/>
-                        <line x1="24" y1="28" x2="24" y2="44" stroke="#92400e" strokeWidth="2.5" strokeLinecap="round"/>
-                        <rect x="10" y="38" width="28" height="6" rx="3" fill="#fde68a" stroke="#f59e0b" strokeWidth="1.5"/>
-                        <circle cx="24" cy="28" r="3" fill="#78350f"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    title: "Bar e Tavola Calda",
-                    desc: "Bar, colazioni, pranzi e aperitivi.",
-                    glow: "hover:shadow-amber-200/60", border: "hover:border-amber-300", shine: "from-amber-400/10",
-                    svg: (
-                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="12" y="20" width="24" height="20" rx="4" fill="#fde68a" stroke="#f59e0b" strokeWidth="1.5"/>
-                        <path d="M36 24 Q44 26 42 34 Q38 36 36 34" fill="#fed7aa" stroke="#f97316" strokeWidth="1.5"/>
-                        <path d="M14 20 Q12 10 18 8 Q16 14 22 12" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                        <path d="M20 20 Q18 12 24 10 Q22 16 28 14" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                        <rect x="8" y="40" width="32" height="3" rx="1.5" fill="#d97706"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    title: "Docce Calde e Fredde",
-                    desc: "Docce e servizi sempre puliti.",
-                    glow: "hover:shadow-cyan-200/60", border: "hover:border-cyan-300", shine: "from-cyan-400/10",
-                    svg: (
-                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="14" r="8" fill="#bae6fd" stroke="#0ea5e9" strokeWidth="1.5"/>
-                        <path d="M16 22 Q12 28 14 34" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                        <path d="M24 22 L24 36" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round"/>
-                        <path d="M32 22 Q36 28 34 34" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                        {[16,24,32].map((cx,i) => <circle key={i} cx={cx} cy={40} r="2" fill="#0ea5e9" opacity="0.7"/>)}
-                      </svg>
-                    )
-                  },
-                  {
-                    title: "Zone Ombra e Picnic",
-                    desc: "Aree picnic attrezzate all'ombra.",
-                    glow: "hover:shadow-emerald-200/60", border: "hover:border-emerald-300", shine: "from-emerald-400/10",
-                    svg: (
-                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 6 Q12 18 18 28 Q20 32 24 32 Q28 32 30 28 Q36 18 24 6Z" fill="#4ade80" stroke="#16a34a" strokeWidth="1.5"/>
-                        <rect x="22" y="30" width="4" height="12" rx="2" fill="#92400e"/>
-                        <rect x="10" y="40" width="28" height="3" rx="1.5" fill="#d97706"/>
-                        <rect x="14" y="38" width="20" height="2" rx="1" fill="#fde68a"/>
-                        <rect x="8" y="36" width="4" height="5" rx="1" fill="#a3a3a3"/>
-                        <rect x="36" y="36" width="4" height="5" rx="1" fill="#a3a3a3"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    title: "Cabine Private",
-                    desc: "Cabine riservate per cambiarsi.",
-                    glow: "hover:shadow-blue-200/60", border: "hover:border-blue-300", shine: "from-blue-400/10",
-                    svg: (
-                      <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="8" y="22" width="32" height="22" rx="3" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.5"/>
-                        <polygon points="4,24 24,6 44,24" fill="#93c5fd" stroke="#3b82f6" strokeWidth="1.5"/>
-                        <rect x="19" y="32" width="10" height="12" rx="2" fill="#bfdbfe" stroke="#3b82f6" strokeWidth="1"/>
-                        <circle cx="27" cy="38" r="1.5" fill="#2563eb"/>
-                        <rect x="11" y="26" width="6" height="8" rx="1" fill="white" stroke="#93c5fd" strokeWidth="1"/>
-                        <rect x="31" y="26" width="6" height="8" rx="1" fill="white" stroke="#93c5fd" strokeWidth="1"/>
-                      </svg>
-                    )
-                  },
-                ].map((s, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 60 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ type: "spring", stiffness: 90, damping: 14, delay: index * 0.1 }}
-                    whileHover={{ y: -10, scale: 1.03 }}
-                    className={`bg-white p-6 rounded-2xl shadow-sm border border-stone-200 ${s.border} ${s.glow} hover:shadow-xl text-center flex flex-col items-center relative overflow-hidden group cursor-default transition-all duration-300`}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${s.shine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                    <motion.div
-                      whileHover={{ scale: 1.15, rotate: 5 }}
-                      className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-4 shadow-sm transition-all duration-300 group-hover:shadow-md"
-                    >
-                      {s.svg}
-                    </motion.div>
-                    <h3 className="text-lg font-bold text-stone-900 mb-2 leading-tight relative z-10">{s.title}</h3>
-                    <p className="text-stone-500 text-sm leading-relaxed relative z-10">{s.desc}</p>
-                  </motion.div>
-                ))}
-              </div>
             </div>
           </div>
         </>
       )}
 
+      {/* Chi Siamo Section with Ambient Elements */}
+      {currentPage === 'home' && !isAdmin && (
+        <div className="bg-white py-16 lg:py-24 border-b border-stone-100 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none z-10">
+            <motion.div
+              className="absolute top-10 right-[5%] drop-shadow-sm"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            >
+              <Star className="w-24 h-24 text-red-400 fill-red-300/80" />
+            </motion.div>
+            <motion.div
+              className="absolute bottom-20 left-[2%] drop-shadow-sm"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            >
+              <Anchor className="w-32 h-32 text-slate-800 opacity-20" />
+            </motion.div>
+          </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="booking-section">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-emerald-900 tracking-tight">
-            {isAdmin ? 'Gestione Stabilimento' : 'Prenota il tuo posto al sole'}
-          </h2>
-          <button
-            onClick={() => setIsAdmin(!isAdmin)}
-            className="flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-emerald-200"
-          >
-            <ShieldAlert className="w-4 h-4 mr-2" />
-            {isAdmin ? 'Vista Cliente' : 'Area Admin'}
-          </button>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+            <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className="mb-10 lg:mb-0"
+              >
+                <h2 className="text-3xl font-bold text-emerald-900 mb-6 tracking-tight">Vivi l'estate perfetta con noi</h2>
+                <p className="text-lg text-stone-600 mb-4 leading-relaxed">
+                  Da oltre trent'anni La Capannina è il punto di riferimento a Lavinio per chi cerca una vacanza all'insegna del puro relax e del divertimento in un ambiente curato e familiare.
+                </p>
+                <p className="text-lg text-stone-600 leading-relaxed">
+                  Gestito con passione, il nostro stabilimento dispone della rinomata e modernissima "Area Riva" direttamente a contatto col bagnasciuga, e un'organizzazione su file che garantisce privacy e tranquillità. Potrai degustare ottimi stuzzichini sotto l'ombrellone o nel nostro bar centrale.
+                </p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className="relative rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src="/capannina-sunset.png"
+                  alt="Il nostro lido al tramonto"
+                  className="w-full h-80 object-cover"
+                />
+                <div className="absolute inset-0 bg-emerald-900/10 pointer-events-none"></div>
+              </motion.div>
+            </div>
+          </div>
         </div>
+      )}
 
-        {isAdmin ? (
-          <AdminPanel />
-        ) : (
-          <div className="space-y-8">
-            {/* Date Picker Section */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100 flex flex-col md:flex-row md:items-end gap-6">
-              <div className="flex-1 space-y-2">
-                <label className="text-sm font-semibold text-emerald-800 flex items-center">
-                  <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
-                  Data Arrivo
-                </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
-                />
-              </div>
-              <div className="flex-1 space-y-2">
-                <label className="text-sm font-semibold text-emerald-800 flex items-center">
-                  <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
-                  Data Partenza
-                </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  min={startDate}
-                  className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
-                />
-              </div>
-              <div className="flex-none">
-                <button
-                  onClick={fetchAvailability}
-                  className="w-full md:w-auto px-8 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
-                >
-                  Verifica Disponibilità
-                </button>
-              </div>
+      {/* I Nostri Servizi Section with Ambient Elements */}
+      {currentPage === 'home' && !isAdmin && (
+        <div className="bg-gradient-to-b from-stone-50 to-emerald-50/30 py-16 lg:py-24 relative overflow-hidden">
+
+          {/* Floating Fishes & Bubbles (z-0 to ensure they stay strictly IN BACK of the cards) */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            {/* Textured Bubbles */}
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={`bubble-${i}`}
+                className="absolute rounded-full"
+                style={{
+                  left: `${10 + (i * 12)}%`,
+                  width: `${8 + (Math.random() * 24)}px`,
+                  height: `${8 + (Math.random() * 24)}px`,
+                  background: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(110, 231, 183, 0.2), rgba(16, 185, 129, 0.1))',
+                  boxShadow: 'inset 2px 2px 4px rgba(255, 255, 255, 0.6), inset -2px -2px 4px rgba(16, 185, 129, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)'
+                }}
+                initial={{ bottom: '-10%', opacity: 0 }}
+                animate={{
+                  bottom: '120%',
+                  opacity: [0, 0.9, 0],
+                  x: [0, Math.random() > 0.5 ? 30 : -30, 0]
+                }}
+                transition={{
+                  duration: 4 + Math.random() * 6,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: Math.random() * 5
+                }}
+              />
+            ))}
+
+          </div>
+          {/* Wrapper with overflow-hidden to prevent fishes from causing horizontal scroll */}
+          <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
+            {/* Original Cute Fishes Placed in Empty Spaces */}
+            <motion.div
+              className="absolute top-8 left-[-10%]"
+              animate={{ x: ['0vw', '110vw'], y: [0, -10, 0] }}
+              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            >
+              {/* Swims right -> normal orientation because Lucide Fish faces right by default */}
+              <Fish className="w-12 h-12 text-orange-400 fill-orange-300 drop-shadow-md opacity-80" />
+            </motion.div>
+
+            <motion.div
+              className="absolute top-16 right-[-10%]"
+              animate={{ x: ['10vw', '-110vw'], y: [0, 15, 0] }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 2 }}
+            >
+              {/* Swims left -> needs scaleX(-1) to flip it */}
+              <Fish className="w-10 h-10 text-blue-400 fill-blue-300 drop-shadow-md opacity-70 transform -scale-x-100" />
+            </motion.div>
+
+            <motion.div
+              className="absolute bottom-8 right-[-10%]"
+              animate={{ x: ['10vw', '-110vw'], y: [0, -10, 0] }}
+              transition={{ duration: 22, repeat: Infinity, ease: "linear", delay: 8 }}
+            >
+              {/* Swims left -> needs scaleX(-1) to flip it */}
+              <Fish className="w-14 h-14 text-emerald-500 fill-emerald-400 drop-shadow-lg opacity-80 transform -scale-x-100" />
+            </motion.div>
+          </div>
+
+          {/* Animated Sweeping Wave for Services */}
+          <div className="absolute inset-x-0 bottom-0 h-80 overflow-hidden pointer-events-none z-0 opacity-80">
+            <motion.svg
+              viewBox="0 0 1200 120"
+              preserveAspectRatio="none"
+              className="absolute bottom-0 w-[200%] h-full fill-emerald-200/80"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            >
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C79.44,115.54,166.7,126.91,245.8,111.45A651.92,651.92,0,0,0,321.39,56.44Z" />
+            </motion.svg>
+            {/* Second wave layer for more depth */}
+            <motion.svg
+              viewBox="0 0 1200 120"
+              preserveAspectRatio="none"
+              className="absolute bottom-0 w-[200%] h-3/4 fill-emerald-300/60"
+              animate={{ x: ['-50%', '0%'] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            >
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C79.44,115.54,166.7,126.91,245.8,111.45A651.92,651.92,0,0,0,321.39,56.44Z" />
+            </motion.svg>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-emerald-900 tracking-tight">I Nostri Servizi</h2>
+              <p className="mt-4 text-lg text-stone-600">Tutto ciò di cui hai bisogno per la tua giornata ideale.</p>
             </div>
 
-            {/* Beach Grid */}
-            {loading ? (
-              <BeachSkeleton />
-            ) : (
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                  <h3 className="text-xl font-bold text-emerald-900">Mappa Spiaggia</h3>
-                  <div className="flex flex-wrap gap-3 md:gap-4 text-xs md:text-sm font-medium">
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-100 border border-emerald-300 mr-1.5 shadow-sm"></span> Libero</div>
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-red-100 border border-red-300 mr-1.5 shadow-sm"></span> Occupato</div>
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1.5 shadow-sm"></span> Abbonato</div>
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-700 mr-1.5 shadow-sm"></span> Selezionato</div>
-                  </div>
-                </div>
-                <BeachGrid
-                  umbrellas={umbrellas}
-                  onToggleSelect={handleToggleSelect}
-                  selectedUmbrellas={selectedUmbrellas}
-                />
-              </div>
-            )}
-
-            {/* Pool Section */}
-            {!loading && <PoolSection />}
-
-            {/* AnimatePresence for the Booking Cart mounting/unmounting */}
-            <AnimatePresence>
-              {selectedUmbrellas.length > 0 && !isAdmin && (
-                <motion.div
-                  key="booking-cart-wrapper"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <BookingCart
-                    selectedUmbrellas={selectedUmbrellas}
-                    startDate={startDate}
-                    endDate={endDate}
-                    onCancel={() => setSelectedUmbrellas([])}
-                    onBook={handleBook}
-                    onRemoveItem={handleToggleSelect}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <ServiceCards />
           </div>
-        )}
+        </div>
+      )}
 
-        <SuccessVoucher 
-          isOpen={!!voucherData} 
-          onClose={() => setVoucherData(null)} 
-          bookingDetails={voucherData || { userName: '', userEmail: '', userPhone: '', startDate: '', endDate: '', umbrellas: [] }} 
-        />
-      </main>
-    </div>
-  );
-}
+      {/* Booking Section */}
+      {currentPage === 'home' && (
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="booking-section">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold text-emerald-900 tracking-tight">
+                  {isAdmin ? 'Gestione Stabilimento' : 'Prenota il tuo posto al sole'}
+                </h2>
+                <button
+                  onClick={() => setIsAdmin(!isAdmin)}
+                  className="flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-emerald-200"
+                >
+                  <ShieldAlert className="w-4 h-4 mr-2" />
+                  {isAdmin ? 'Vista Cliente' : 'Area Admin'}
+                </button>
+              </div>
+
+              {isAdmin ? (
+                <AdminPanel />
+              ) : (
+                <div className="space-y-8">
+                  {/* Date Picker Section */}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100 flex flex-col md:flex-row md:items-end gap-6">
+                    <div className="flex-1 space-y-2">
+                      <label className="text-sm font-semibold text-emerald-800 flex items-center">
+                        <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
+                        Data Arrivo
+                      </label>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <label className="text-sm font-semibold text-emerald-800 flex items-center">
+                        <CalendarIcon className="w-4 h-4 mr-2 text-emerald-600" />
+                        Data Partenza
+                      </label>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        min={startDate}
+                        className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-shadow text-stone-700 font-medium"
+                      />
+                    </div>
+                    <div className="flex-none">
+                      <button
+                        onClick={fetchAvailability}
+                        className="w-full md:w-auto px-8 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
+                      >
+                        Verifica Disponibilità
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Beach Grid */}
+                  {loading ? (
+                    <BeachSkeleton />
+                  ) : (
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                        <h3 className="text-xl font-bold text-emerald-900">Mappa Spiaggia</h3>
+                        <div className="flex flex-wrap gap-3 md:gap-4 text-xs md:text-sm font-medium">
+                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-100 border border-emerald-300 mr-1.5 shadow-sm"></span> Libero</div>
+                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-red-100 border border-red-300 mr-1.5 shadow-sm"></span> Occupato</div>
+                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-blue-500 mr-1.5 shadow-sm"></span> Abbonato</div>
+                          <div className="flex items-center"><span className="w-3 h-3 rounded-full bg-emerald-700 mr-1.5 shadow-sm"></span> Selezionato</div>
+                        </div>
+                      </div>
+                      <BeachGrid
+                        umbrellas={umbrellas}
+                        onToggleSelect={handleToggleSelect}
+                        selectedUmbrellas={selectedUmbrellas}
+                      />
+                    </div>
+                  )}
+
+                  {/* Pool Section */}
+                  {!loading && <PoolSection />}
+
+                  {/* AnimatePresence for the Booking Cart mounting/unmounting */}
+                  <AnimatePresence>
+                    {selectedUmbrellas.length > 0 && !isAdmin && (
+                      <motion.div
+                        key="booking-cart-wrapper"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <BookingCart
+                          selectedUmbrellas={selectedUmbrellas}
+                          startDate={startDate}
+                          endDate={endDate}
+                          onCancel={() => setSelectedUmbrellas([])}
+                          onBook={handleBook}
+                          onRemoveItem={handleToggleSelect}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              <SuccessVoucher
+                isOpen={!!voucherData}
+                onClose={() => setVoucherData(null)}
+                bookingDetails={voucherData || { userName: '', userEmail: '', userPhone: '', startDate: '', endDate: '', umbrellas: [] }}
+              />
+            </main>
+          )}
+        </div>
+      );
+    }

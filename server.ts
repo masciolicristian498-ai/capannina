@@ -2,6 +2,12 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import Database from 'better-sqlite3';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const db = new Database('capannina.db');
 
@@ -144,7 +150,7 @@ async function startServer() {
 
     const insertBooking = db.prepare(`
       INSERT INTO bookings (row_number, umbrella_number, zone_id, quantity, start_date, end_date, user_name, user_email, user_phone, total_price, is_paid, payment_method)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertService = db.prepare(`
@@ -166,6 +172,7 @@ async function startServer() {
           b.user_email,
           b.user_phone,
           b.total_price,
+          (b.payment_method === 'cassa' ? 0 : 1),
           b.payment_method ?? 'online'
         );
         const bookingId = info.lastInsertRowid;
@@ -250,7 +257,21 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
+  } else {
+    // Production: serve static files from dist
+    app.use(express.static(path.join(__dirname, 'dist')));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    });
   }
+
+  // Global Error Handler
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const logMessage = `[${new Date().toISOString()}] ${err.stack || err}\n`;
+    fs.appendFileSync(path.join(__dirname, 'crash.log'), logMessage);
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -107,7 +107,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
         }}
         className={clsx(
           "flex flex-col items-center justify-center transition-colors duration-200 shadow-sm relative group shrink-0",
-          "w-8 h-8 md:w-10 md:h-10 rounded-full",
+          "w-6 h-6 md:w-8 md:h-8 rounded-full",
           umbrella.isBooked
             ? umbrella.isSubscription 
                 ? "bg-blue-500 text-white cursor-not-allowed border border-blue-600"
@@ -119,8 +119,8 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
         disabled={umbrella.isBooked}
         title={umbrella.isBooked ? (umbrella.isSubscription ? "Abbonato" : "Prenotato") : `Ombrellone ${displayNumber} (Fila ${umbrella.row})`}
       >
-        <BeachUmbrellaIcon className={clsx("w-4 h-4 md:w-5 md:h-5", isSelected || umbrella.isSubscription ? "text-white" : umbrella.isBooked ? "text-red-400" : "text-emerald-600")} />
-        <span className={clsx("text-[8px] md:text-[9px] font-bold absolute -bottom-4", isSelected || umbrella.isSubscription ? "text-blue-800" : "text-stone-600")}>
+        <BeachUmbrellaIcon className={clsx("w-3 h-3 md:w-4 md:h-4", isSelected || umbrella.isSubscription ? "text-white" : umbrella.isBooked ? "text-red-400" : "text-emerald-600")} />
+        <span className={clsx("text-[6px] md:text-[8px] font-bold absolute -bottom-3", isSelected || umbrella.isSubscription ? "text-blue-800" : "text-stone-600")}>
           {displayNumber}
         </span>
       </motion.button>
@@ -133,9 +133,9 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
       {/* Inner container with w-max to naturally define the scrolling width without forcing a strict min-width */}
-      <div className="w-max min-w-full mx-auto flex flex-col items-center space-y-4 py-4 px-4 md:px-8">
+      <div className="w-max min-w-full mx-auto flex flex-col items-center space-y-1.5 py-2 px-4 md:px-8">
         {/* The Sea */}
-        <div className="w-full h-12 md:h-16 bg-gradient-to-b from-blue-500 to-blue-300 rounded-xl flex items-center justify-center text-white font-bold tracking-widest uppercase mb-2 shadow-md text-sm md:text-base relative overflow-hidden z-0">
+        <div className="w-full h-8 md:h-10 bg-gradient-to-b from-blue-500 to-blue-300 rounded-xl flex items-center justify-center text-white font-bold tracking-widest uppercase mb-1 shadow-md text-sm md:text-base relative overflow-hidden z-0">
           
           {/* Animated Shore Waves (Onde che sbattono sulla riva) */}
           <motion.div 
@@ -159,8 +159,8 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
 
         {/* Riva (Shore) ZONES */}
         <div className="flex flex-col items-center w-full">
-          <div className="text-xs font-bold text-stone-600 bg-stone-200/50 px-4 py-1.5 rounded-full mb-3 uppercase tracking-widest border border-stone-300/50 shadow-sm flex items-center gap-2">
-            <SunbedIcon className="w-4 h-4 text-stone-500" />
+          <div className="text-[10px] font-bold text-stone-600 bg-stone-200/50 px-3 py-1 rounded-full mb-1.5 uppercase tracking-widest border border-stone-300/50 shadow-sm flex items-center gap-1.5">
+            <SunbedIcon className="w-3 h-3 text-stone-500" />
             Riva (Lettini)
           </div>
 
@@ -169,10 +169,10 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
             {rivaZones.length > 0 && renderItem(rivaZones[0])}
 
             {/* Lifeguard 1 */}
-            <div className="flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl border-2 border-red-500 text-red-600 shadow-md relative shrink-0" title="Postazione Bagnino 1 con Pattino">
-              <LifeBuoy className="w-6 h-6" />
-              <div className="absolute -top-4 w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
-                <BeachUmbrellaIcon className="w-4 h-4 text-white" />
+            <div className="flex flex-col items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl border-2 border-red-500 text-red-600 shadow-md relative shrink-0" title="Postazione Bagnino 1 con Pattino">
+              <LifeBuoy className="w-5 h-5" />
+              <div className="absolute -top-3 w-5 h-5 md:w-6 md:h-6 bg-red-600 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+                <BeachUmbrellaIcon className="w-3 h-3 text-white" />
               </div>
             </div>
 
@@ -180,10 +180,10 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
             {rivaZones.length > 1 && renderItem(rivaZones[1])}
 
             {/* Lifeguard 2 */}
-            <div className="flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl border-2 border-red-500 text-red-600 shadow-md relative shrink-0" title="Postazione Bagnino 2 con Pattino">
-              <LifeBuoy className="w-6 h-6" />
-              <div className="absolute -top-4 w-6 h-6 md:w-8 md:h-8 bg-red-600 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
-                <BeachUmbrellaIcon className="w-4 h-4 text-white" />
+            <div className="flex flex-col items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl border-2 border-red-500 text-red-600 shadow-md relative shrink-0" title="Postazione Bagnino 2 con Pattino">
+              <LifeBuoy className="w-5 h-5" />
+              <div className="absolute -top-3 w-5 h-5 md:w-6 md:h-6 bg-red-600 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+                <BeachUmbrellaIcon className="w-3 h-3 text-white" />
               </div>
             </div>
 
@@ -194,13 +194,13 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
 
         {/* Umbrella Rows */}
         {rows.map((row, i) => (
-          <div key={i} className="flex flex-col items-center w-full relative pt-5">
-            <div className="text-[10px] md:text-xs font-bold text-stone-600 bg-stone-200/50 px-3 py-1 rounded-full mb-3 uppercase tracking-wider border border-stone-300/50 shadow-sm relative z-10 bg-stone-100">
+          <div key={i} className="flex flex-col items-center w-full relative pt-2">
+            <div className="text-[9px] md:text-[10px] font-bold text-stone-600 bg-stone-200/50 px-2.5 py-0.5 rounded-full mb-1.5 uppercase tracking-wider border border-stone-300/50 shadow-sm relative z-10 bg-stone-100">
               Fila {i + 1}
             </div>
 
             {/* Visual separator line for the row */}
-            <div className="absolute top-7 left-4 right-4 h-px bg-stone-300/50 -z-0"></div>
+            <div className="absolute top-4 left-4 right-4 h-px bg-stone-300/50 -z-0"></div>
 
             <div className="flex items-center justify-center gap-2 md:gap-4 w-full px-1 md:px-2">
               {/* Left side (1-15) */}
@@ -224,8 +224,8 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
         ))}
 
         {/* The Beach / Entrance */}
-        <div className="w-full h-8 md:h-10 bg-stone-200/80 rounded-xl border border-stone-300/50 flex flex-col items-center justify-center text-stone-600 text-xs font-bold tracking-widest uppercase mt-4 relative shadow-sm">
-          <div className="absolute -top-4 w-12 h-4 bg-stone-200/80 border-x border-t border-stone-300/50 rounded-t-lg"></div>
+        <div className="w-full h-6 md:h-8 bg-stone-200/80 rounded-xl border border-stone-300/50 flex flex-col items-center justify-center text-stone-600 text-[10px] font-bold tracking-widest uppercase mt-2 relative shadow-sm">
+          <div className="absolute -top-2 w-10 h-2 bg-stone-200/80 border-x border-t border-stone-300/50 rounded-t-lg"></div>
           Ingresso Stabilimento
         </div>
       </div>

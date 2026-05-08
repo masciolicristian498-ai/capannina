@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, Calendar, MapPin, Hash, Mail, Phone, User, Waves, Home, Share2 } from 'lucide-react';
 
 interface SuccessVoucherProps {

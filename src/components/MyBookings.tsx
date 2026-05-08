@@ -20,6 +20,9 @@ function formatPostazione(b: Booking) {
     const zone = b.zone_id ? `Zona ${b.zone_id}` : `Zona ${b.umbrella_number === 1 ? 'A' : b.umbrella_number === 2 ? 'B' : 'C'}`;
     return `Riva – ${zone}${b.quantity && b.quantity > 1 ? ` (×${b.quantity} lettini)` : ''}`;
   }
+  if (b.row_number === -1) {
+    return `Area Piscina${b.quantity && b.quantity > 1 ? ` (×${b.quantity} ingressi)` : ''}`;
+  }
   return `Fila ${b.row_number}, Ombrellone N.${b.umbrella_number * 10 + b.row_number}`;
 }
 
@@ -207,9 +210,16 @@ export function MyBookings() {
 }
 
 // ─── Booking Card ─────────────────────────────────────────────────────────────
-function BookingCard({ booking: b, index, onDelete, deletingId, canDelete }: {
-  booking: Booking; index: number; onDelete: (id: number) => Promise<void>; deletingId: number | null; canDelete: boolean;
-}) {
+interface BookingCardProps {
+  key?: React.Key | null;
+  booking: Booking;
+  index: number;
+  onDelete: (id: number) => Promise<void>;
+  deletingId: number | null;
+  canDelete: boolean;
+}
+
+function BookingCard({ booking: b, index, onDelete, deletingId, canDelete }: BookingCardProps) {
   const isDeleting = deletingId === b.id;
 
   return (
