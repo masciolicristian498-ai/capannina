@@ -55,7 +55,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
             }, 100);
           }}
           className={clsx(
-            "flex flex-col items-center justify-center p-1.5 transition-colors duration-200 shadow-sm relative group shrink-0 rounded-xl border-2 w-full max-w-[200px] md:max-w-[240px] lg:flex-1 h-14 md:h-16",
+            "flex flex-col items-center justify-center p-1 transition-colors duration-200 shadow-sm relative group shrink-0 rounded-xl border-2 w-full max-w-[200px] md:max-w-[240px] lg:flex-1 h-12",
             umbrella.isBooked
               ? umbrella.isSubscription 
                   ? "bg-blue-500 text-white cursor-not-allowed border-blue-600" 
@@ -77,7 +77,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
               </span>
             ) : (
               <span className={clsx(
-                "mt-1 px-2 py-0.5 rounded-full text-[11px] font-black leading-none",
+                "px-1.5 py-0.5 rounded-full text-[9px] font-black leading-none",
                 isSelected ? "bg-white/30 text-white" : "bg-emerald-100 text-emerald-800"
               )}>
                 🏖️ {umbrella.availableQuantity} lettini liberi
@@ -129,13 +129,13 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
 
   return (
     <div 
-      className="w-full h-full bg-stone-100 rounded-2xl shadow-inner border border-stone-200 overflow-x-auto overflow-y-auto relative"
+      className="w-full h-full bg-stone-100 rounded-2xl shadow-inner border border-stone-200 overflow-x-auto overflow-y-hidden relative"
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
       {/* Inner container: wide enough for 31 umbrellas, tall enough to fill the parent */}
-      <div className="w-max min-w-full h-full flex flex-col items-center justify-between py-2 px-4 md:px-8 gap-1">
+      <div className="w-max min-w-full h-full flex flex-col items-center justify-between py-1 px-4 md:px-8">
         {/* The Sea */}
-        <div className="w-full h-6 bg-gradient-to-b from-blue-500 to-blue-300 rounded-xl flex items-center justify-center text-white font-bold tracking-widest uppercase shadow-md text-xs relative overflow-hidden z-0 shrink-0">
+        <div className="w-full h-5 bg-gradient-to-b from-blue-500 to-blue-300 rounded-xl flex items-center justify-center text-white font-bold tracking-widest uppercase shadow-md text-xs relative overflow-hidden z-0 shrink-0">
           
           {/* Animated Shore Waves (Onde che sbattono sulla riva) */}
           <motion.div 
@@ -194,7 +194,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
 
         {/* Umbrella Rows */}
         {rows.map((row, i) => (
-          <div key={i} className="flex flex-col items-center w-full relative pt-1">
+          <div key={i} className="flex flex-col items-center w-full relative">
             <div className="text-[8px] md:text-[9px] font-bold text-stone-600 bg-stone-200/50 px-2 py-0.5 rounded-full mb-1 uppercase tracking-wider border border-stone-300/50 shadow-sm relative z-10 bg-stone-100 shrink-0">
               Fila {i + 1}
             </div>
@@ -209,7 +209,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
               </div>
 
               {/* Central Walkway */}
-              <div className="w-8 md:w-12 flex items-center justify-center relative shrink-0 h-10">
+              <div className="w-6 flex items-center justify-center relative shrink-0 h-8">
                 <div className="w-6 md:w-8 absolute inset-y-[-6px] bg-stone-200/50 rounded-md border-x border-stone-300/50 flex items-center justify-center text-[6px] md:text-[7px] text-stone-400 font-bold uppercase tracking-widest rotate-180" style={{ writingMode: 'vertical-rl' }}>
                   Passaggio
                 </div>
@@ -224,7 +224,7 @@ export function BeachGrid({ umbrellas, onToggleSelect, selectedUmbrellas }: Beac
         ))}
 
         {/* The Beach / Entrance */}
-        <div className="w-full h-4 bg-stone-200/80 rounded-xl border border-stone-300/50 flex flex-col items-center justify-center text-stone-600 text-[8px] font-bold tracking-widest uppercase relative shadow-sm shrink-0">
+        <div className="w-full h-4 bg-stone-200/80 rounded-xl border border-stone-300/50 flex items-center justify-center text-stone-600 text-[8px] font-bold tracking-widest uppercase relative shadow-sm shrink-0">
           <div className="absolute -top-2 w-10 h-2 bg-stone-200/80 border-x border-t border-stone-300/50 rounded-t-lg"></div>
           Ingresso Stabilimento
         </div>

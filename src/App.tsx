@@ -362,12 +362,12 @@ export default function App() {
       {/* Booking Section */}
       {currentPage === 'home' && (
             <main
-              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3"
               id="booking-section"
               style={{ height: 'calc(100vh - 4rem)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
             >
               {/* Title + Admin toggle */}
-              <div className="flex justify-between items-center mb-4 shrink-0">
+              <div className="flex justify-between items-center mb-2 shrink-0">
                 <h2 className="text-2xl font-bold text-emerald-900 tracking-tight">
                   {isAdmin ? 'Gestione Stabilimento' : 'Prenota il tuo posto al sole'}
                 </h2>
@@ -432,8 +432,8 @@ export default function App() {
                           <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-700 mr-1"></span>Selezionato</div>
                         </div>
                       </div>
-                      {/* Grid — overflow-y auto (scrolls inside card), overflow-x auto */}
-                      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
+                      {/* Grid — horizontal scroll only, no vertical scroll */}
+                      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden">
                         <BeachGrid
                           umbrellas={umbrellas}
                           onToggleSelect={handleToggleSelect}
